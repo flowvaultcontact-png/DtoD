@@ -1,91 +1,48 @@
 {
   "problem": "brain greedy output equals the certified ground-truth channel (Frontier-Parity Distillation, AutonomousProofEngine v2 certifier)",
-  "mode": "brain_only_ngram_ground_truth",
+  "mode": "glm_frontier_channel_llamacpp",
   "model": "/tmp/glm53/UD-IQ1_S",
   "brain_dir": "/tmp/glm53-brain",
   "prompt": "The capital of France is",
   "rounds": [
     {
       "round": 1,
-      "distill_loss_first": 5.650283101292372,
-      "distill_loss_last": 4.3274474636948925,
+      "distill_loss_first": 5.754451928913941,
+      "distill_loss_last": 5.150748138846543,
       "status": "PROVEN_EXACT",
-      "certified_fn": "-log(1727619336023344218750*lam**2 - 7111494998942959899875*lam + 6828858843998556651349)/2 + log(59667397179967*sqrt(715427689479252806)/12502149796000)",
+      "certified_fn": "-log(6106815544046*lam**2 + 143795260991*lam + 782498709)/2 - log(500) + log(782498709)/2",
       "gaps": [],
       "residuals": [
-        0.024965889725977845,
-        0.024181054985817914
+        0.2342843767126861,
+        0.13324405327059335
       ],
       "positions": {
         "a": [
-          0.06367346836721846,
-          0.03589743948057636
+          0.001,
+          0.001
         ],
         "b": [
-          0.038707578641240616,
-          0.011716384494758448
+          0.2352843767126861,
+          0.13424405327059336
         ],
         "argmax_agree": [
           false,
-          true
+          false
         ]
       },
-      "evidence_positions": 64,
-      "lam_star": 0.0,
+      "evidence_positions": 16,
+      "lam_star": 1.0,
       "lam_boundary": true,
       "parity_certified": false,
       "battery": [
         {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
+          "prompt": " countries of the European Union. Paris is famous for the E",
           "exact": false,
           "first_divergence": 0,
           "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            279,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            11,
-            279,
-            9621,
-            11
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
+            3092,
+            301,
+            21884,
             13,
             12089,
             374,
@@ -94,27 +51,54 @@
             279,
             468,
             3092,
-            301,
-            21884,
-            11
+            301
           ],
           "brain_tokens": [
             279,
-            9621,
-            11,
-            279,
-            9621,
-            11,
-            11,
-            11,
-            11,
+            374,
             279,
             279,
+            279,
+            6722,
+            279,
+            315,
+            279,
+            279,
+            315,
+            279
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
             9621,
-            11,
-            11,
-            11,
-            11
+            13
+          ],
+          "brain_tokens": [
+            279,
+            279,
+            6722,
+            315,
+            279,
+            279,
+            374,
+            279,
+            279,
+            315,
+            279,
+            279
           ]
         },
         {
@@ -124,123 +108,72 @@
           "model_tokens": [
             12089,
             13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
+            1084,
+            374,
+            7407,
             304,
             279,
             10195,
+            83388,
+            949,
             315,
-            9621,
-            323,
-            702,
-            1012
+            9621
           ],
           "brain_tokens": [
-            11,
-            11,
+            374,
             279,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
             279,
-            9621,
-            11,
-            11,
-            11,
             279,
-            11
+            315,
+            279,
+            279,
+            315,
+            279,
+            279,
+            279,
+            279
           ]
         }
       ]
     },
     {
       "round": 2,
-      "distill_loss_first": 4.196135222941263,
-      "distill_loss_last": 4.142696517097206,
-      "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-      "certified_fn": null,
+      "distill_loss_first": 4.4982448100360575,
+      "distill_loss_last": 4.184545956656829,
+      "status": "PROVEN_EXACT",
+      "certified_fn": "-log(308479927980807*lam**2 + 6067174843922*lam + 27621038928)/2 - log(500) + log(27621038928)/2",
       "gaps": [],
       "residuals": [
-        0.006561943535792827,
-        0.02227611667374168
+        0.27946022634722817,
+        0.15985524326450706
       ],
       "positions": {
         "a": [
-          0.06367346836721846,
-          0.03589743948057636
+          0.001,
+          0.001
         ],
         "b": [
-          0.07023541190301129,
-          0.013621322806834679
+          0.28046022634722817,
+          0.16085524326450706
         ],
         "argmax_agree": [
-          true,
-          true
+          false,
+          false
         ]
       },
-      "evidence_positions": 64,
-      "lam_star": null,
-      "lam_boundary": false,
+      "evidence_positions": 16,
+      "lam_star": 1.0,
+      "lam_boundary": true,
       "parity_certified": false,
       "battery": [
         {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
+          "prompt": " countries of the European Union. Paris is famous for the E",
           "exact": false,
           "first_divergence": 0,
           "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            11,
-            279,
-            9621,
-            11,
-            11,
-            11
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
+            3092,
+            301,
+            21884,
             13,
             12089,
             374,
@@ -249,27 +182,54 @@
             279,
             468,
             3092,
-            301,
-            21884,
-            11
+            301
           ],
           "brain_tokens": [
-            11,
             279,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            323,
-            11,
+            374,
+            279,
+            6722,
+            315,
+            374,
+            279,
+            6722,
+            315,
+            279,
+            374,
             279
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
+          ],
+          "brain_tokens": [
+            279,
+            315,
+            279,
+            374,
+            279,
+            6722,
+            315,
+            279,
+            6722,
+            315,
+            279,
+            6722
           ]
         },
         {
@@ -279,588 +239,72 @@
           "model_tokens": [
             12089,
             13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
+            1084,
+            374,
+            7407,
             304,
             279,
             10195,
+            83388,
+            949,
             315,
-            9621,
-            323,
-            702,
-            1012
+            9621
           ],
           "brain_tokens": [
-            11,
+            374,
             279,
-            9621,
-            11,
-            11,
-            323,
             279,
-            11,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            323,
+            374,
             279,
-            9621
+            6722,
+            6722,
+            315,
+            279,
+            315,
+            279,
+            6722
           ]
         }
       ]
     },
     {
       "round": 3,
-      "distill_loss_first": 4.132282671428015,
-      "distill_loss_last": 4.163633121972594,
-      "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-      "certified_fn": null,
+      "distill_loss_first": 3.7406137269790936,
+      "distill_loss_last": 3.7204091772379972,
+      "status": "PROVEN_EXACT",
+      "certified_fn": "-log(6239560052632731*lam**2 + 170313641434076*lam + 1134056600924)/2 - log(500) + log(1134056600924)/2",
       "gaps": [],
       "residuals": [
-        0.021396561868786912,
-        0.02282365440027504
+        0.17355548385362274,
+        0.12680631695290384
       ],
       "positions": {
         "a": [
-          0.06367346836721846,
-          0.03589743948057636
+          0.001,
+          0.001
         ],
         "b": [
-          0.08507003023600537,
-          0.01307378508030132
-        ],
-        "argmax_agree": [
-          true,
-          true
-        ]
-      },
-      "evidence_positions": 64,
-      "lam_star": null,
-      "lam_boundary": false,
-      "parity_certified": false,
-      "battery": [
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            11,
-            11,
-            9621,
-            11,
-            11,
-            9621,
-            11,
-            11
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
-            13,
-            12089,
-            374,
-            11240,
-            369,
-            279,
-            468,
-            3092,
-            301,
-            21884,
-            11
-          ],
-          "brain_tokens": [
-            279,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            11,
-            11,
-            9621,
-            11,
-            11,
-            11,
-            9621,
-            11,
-            11
-          ]
-        },
-        {
-          "prompt": "The capital of France is",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            12089,
-            13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
-            304,
-            279,
-            10195,
-            315,
-            9621,
-            323,
-            702,
-            1012
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            11,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            11,
-            9621,
-            11,
-            11,
-            11,
-            11
-          ]
-        }
-      ]
-    },
-    {
-      "round": 4,
-      "distill_loss_first": 4.136937240978007,
-      "distill_loss_last": 4.131819937000863,
-      "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-      "certified_fn": null,
-      "gaps": [],
-      "residuals": [
-        0.0090971651577708,
-        0.02508214859743347
-      ],
-      "positions": {
-        "a": [
-          0.06367346836721846,
-          0.03589743948057636
-        ],
-        "b": [
-          0.07277063352498926,
-          0.01081529088314289
-        ],
-        "argmax_agree": [
-          true,
-          true
-        ]
-      },
-      "evidence_positions": 64,
-      "lam_star": null,
-      "lam_boundary": false,
-      "parity_certified": false,
-      "battery": [
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            323,
-            279,
-            11,
-            9621,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11,
-            11,
-            11,
-            323
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
-            13,
-            12089,
-            374,
-            11240,
-            369,
-            279,
-            468,
-            3092,
-            301,
-            21884,
-            11
-          ],
-          "brain_tokens": [
-            279,
-            9621,
-            11,
-            11,
-            11,
-            279,
-            9621,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            323
-          ]
-        },
-        {
-          "prompt": "The capital of France is",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            12089,
-            13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
-            304,
-            279,
-            10195,
-            315,
-            9621,
-            323,
-            702,
-            1012
-          ],
-          "brain_tokens": [
-            11,
-            279,
-            9621,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11,
-            11,
-            279
-          ]
-        }
-      ]
-    },
-    {
-      "round": 5,
-      "distill_loss_first": 4.118193251471645,
-      "distill_loss_last": 4.113468497048768,
-      "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-      "certified_fn": null,
-      "gaps": [],
-      "residuals": [
-        0.04294913014171893,
-        0.1326477512805455
-      ],
-      "positions": {
-        "a": [
-          0.06367346836721846,
-          0.19999999398584362
-        ],
-        "b": [
-          0.10662259850893739,
-          0.06735224270529812
-        ],
-        "argmax_agree": [
-          true,
-          false
-        ]
-      },
-      "evidence_positions": 64,
-      "lam_star": null,
-      "lam_boundary": false,
-      "parity_certified": false,
-      "battery": [
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
-            13,
-            12089,
-            374,
-            11240,
-            369,
-            279,
-            468,
-            3092,
-            301,
-            21884,
-            11
-          ],
-          "brain_tokens": [
-            279,
-            9621,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            323,
-            279,
-            9621
-          ]
-        },
-        {
-          "prompt": "The capital of France is",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            12089,
-            13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
-            304,
-            279,
-            10195,
-            315,
-            9621,
-            323,
-            702,
-            1012
-          ],
-          "brain_tokens": [
-            11,
-            279,
-            9621,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            323,
-            279,
-            9621,
-            11
-          ]
-        }
-      ]
-    },
-    {
-      "round": 6,
-      "distill_loss_first": 4.1109871839569205,
-      "distill_loss_last": 4.117721316604274,
-      "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-      "certified_fn": null,
-      "gaps": [],
-      "residuals": [
-        0.025596101584089342,
-        0.02573411646715084
-      ],
-      "positions": {
-        "a": [
-          0.06367346836721846,
-          0.03589743948057636
-        ],
-        "b": [
-          0.0892695699513078,
-          0.010163323013425518
+          0.17455548385362274,
+          0.12780631695290384
         ],
         "argmax_agree": [
           false,
-          true
+          false
         ]
       },
-      "evidence_positions": 64,
-      "lam_star": null,
-      "lam_boundary": false,
+      "evidence_positions": 16,
+      "lam_star": 1.0,
+      "lam_boundary": true,
       "parity_certified": false,
       "battery": [
         {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme",
+          "prompt": " countries of the European Union. Paris is famous for the E",
           "exact": false,
           "first_divergence": 0,
           "model_tokens": [
-            18795,
-            315,
-            264,
-            3146,
-            13,
-            576,
-            4767,
-            315,
-            9621,
-            6305,
-            304,
-            279,
-            468,
-            398,
-            4060,
-            30179
-          ],
-          "brain_tokens": [
-            9621,
-            11,
-            11,
-            11,
-            323,
-            11,
-            279,
-            9621,
-            11,
-            279,
-            9621,
-            11,
-            11,
-            11,
-            323,
-            11
-          ]
-        },
-        {
-          "prompt": ", and many countries in Africa. Rome is the capital of Italy, Madrid is the capital of Spain, Berlin is the capital of Germany, and Lisbon is the capital of Portugal. London, the capital of the United Kingdom, lies on the Thames. A capital city usually hosts the government, the parliament, and the supreme courts of a country. The president of France lives in the Elysee Palace in Paris, and the prime minister works at the Hotel Matignon. The French flag is blue, white, and red, and the national motto is liberty, equality, fraternity. The euro is the currency used in France and in most other",
-          "exact": false,
-          "first_divergence": 0,
-          "model_tokens": [
-            5837,
-            315,
-            279,
-            7513,
-            9142,
+            3092,
+            301,
+            21884,
             13,
             12089,
             374,
@@ -869,27 +313,54 @@
             279,
             468,
             3092,
-            301,
-            21884,
-            11
+            301
+          ],
+          "brain_tokens": [
+            374,
+            279,
+            279,
+            6722,
+            6722,
+            315,
+            279,
+            374,
+            279,
+            279,
+            6722,
+            279
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
           ],
           "brain_tokens": [
             279,
-            9621,
-            11,
-            11,
-            323,
-            9621,
-            11,
-            11,
-            11,
-            323,
+            6722,
+            315,
             279,
-            11,
-            9621,
-            11,
-            11,
-            323
+            6722,
+            315,
+            279,
+            6722,
+            374,
+            279,
+            6722,
+            315
           ]
         },
         {
@@ -899,52 +370,44 @@
           "model_tokens": [
             12089,
             13,
-            12089,
-            22950,
-            389,
-            279,
-            146737,
-            14785,
+            1084,
+            374,
+            7407,
             304,
             279,
             10195,
+            83388,
+            949,
             315,
-            9621,
-            323,
-            702,
-            1012
+            9621
           ],
           "brain_tokens": [
-            11,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            323,
-            11,
+            374,
             279,
-            9621,
-            11,
-            11,
-            11,
-            11,
-            11,
-            323
+            6722,
+            279,
+            374,
+            279,
+            6722,
+            315,
+            279,
+            279,
+            374,
+            279
           ]
         }
       ]
     }
   ],
-  "engine_status": "INCOMPLETE_PROOF_GAPS_REMAIN",
-  "certified_fn": null,
+  "engine_status": "PROVEN_EXACT",
+  "certified_fn": "-log(6239560052632731*lam**2 + 170313641434076*lam + 1134056600924)/2 - log(500) + log(1134056600924)/2",
   "lam_production": 0.0,
   "brain_only_parity_certified": false,
   "gaps": [
     "brain-only parity not reached; production lam<1 keeps the certified ground-truth channel in the mixture",
-    "exact model inference is refused by ExactFrontierEngine for hybrid glm5-next architectures by design; ground truth = certified corpus n-gram"
+    "ExactFrontierEngine refuses the hybrid glm5-next graph by design; ground truth = llama.cpp reference greedy decoding of the actual frontier weights"
   ],
-  "reference_text": "The capital of France is Paris. Paris sits on the Seine river in the north of France and has been",
-  "production_text": "The capital of France is Paris. Paris sits on the Seine river in the north of France and has been",
-  "tokens_per_s": 82.56407897903836
+  "reference_text": "The capital of France is Paris. It is located in the north-central part of France",
+  "production_text": "The capital of France is Paris. It is located in the north-central part of France",
+  "tokens_per_s": 103.05218300496578
 }

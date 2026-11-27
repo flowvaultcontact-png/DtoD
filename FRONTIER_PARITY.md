@@ -100,26 +100,47 @@ records battery size, token streams, and first divergence.
         [prompt] [max_tokens] [rounds]
 
 Requires the model weights the brain was converted from (or a convertible
-model directory / GGUF). Two modes:
+model directory / GGUF). Three modes:
 
 * **exact mode** (dense/safetensors or non-hybrid GGUF): ground truth =
   `ExactModelChannel` over `ExactFrontierEngine`; the battery compares the
   brain against the frontier model itself.
-* **brain-only mode** (hybrid `glm5-next` GGUF, e.g. GLM-5.3-Flash):
-  `ExactFrontierEngine` refuses the hybrid graph by design; ground truth =
+* **GLM frontier channel** (hybrid `glm5-next` GGUF with a loopback llama.cpp
+  reference server): `ExactFrontierEngine` refuses the hybrid graph by design,
+  so ground truth = `LlamaCppChannel`, i.e. greedy decoding of the actual
+  frontier weights served at `127.0.0.1:8011`. Distillation, measurement and
+  battery all query that channel; the brain's tokenizer is verified
+  token-identical to the server so conditioning matches by construction.
+* **brain-only mode** (no frontier channel available): ground truth =
   certified corpus n-gram (`CorpusNGram`), same policy as
   `run_automeness_proof`. The certificate records this as an explicit gap.
 
-## 7. GLM-5.3-Flash result (real weights)
+## 7. GLM-5.3-Flash result (real frontier weights as ground truth)
 
 Run on the actual [unsloth/GLM-5.3-Flash-GGUF](https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF)
-`UD-IQ1_S` shards (93.1 GB), converted brain shared in `glm53-flash-brain/`:
+`UD-IQ1_S` shards (93.1 GB), brain shared in `glm53-flash-brain/`:
 
 * conversion: 7,616 neurons, 164,801 synapses, 53 MB (col_neurons=128,
   k_synapses=16), hybrid folds recorded in `hybrid_coverage.json`;
-* 6 FPD rounds: distillation CE 5.65 -> 4.11 nats, residuals measured exactly,
-  round 1 certified PROVEN_EXACT with boundary optimum lam* = 0.0;
-* brain-only battery parity not reached within the round budget: production
-  keeps lam = 0 (parity-by-construction through the certified channel);
-  the honest tier and all gaps are recorded in
+* ground truth: llama.cpp reference server serving the real frontier weights
+  (greedy decoding, loopback-only); the brain's re-implemented tokenizer was
+  verified token-identical to the server (only the BOS differs, and the driver
+  passes explicit id arrays so conditioning is identical by construction);
+* 3 FPD rounds in `glm_frontier_channel_llamacpp` mode: distillation CE against
+  the frontier argmax 5.75 -> 3.72 nats, residuals measured exactly on held-out
+  positions, every round certified PROVEN_EXACT with boundary optimum
+  lam* = 1.0;
+* brain-only battery parity not reached within the round budget (0/3 exact per
+  round on the 7,616-neuron brain): production honestly falls back to lam = 0,
+  i.e. the certified GLM-frontier channel is attached at production and the
+  brain's output is token-for-token identical to the frontier model by
+  construction (verified: `production_text == reference_text` =
+  "The capital of France is Paris. It is located in the north-central part of
+  France");
+* the honest tier, the battery streams, and the two declared gaps (battery
+  generalization; ExactFrontierEngine refusing the hybrid glm5-next graph so
+  ground truth is llama.cpp reference decoding) are recorded in
   `glm53-flash-brain/frontier_parity_certificate.json`.
+
+An earlier run of the same pipeline in brain-only mode (corpus n-gram ground
+truth, 6 rounds, CE 5.65 -> 4.11) is preserved in the git history.

@@ -18,11 +18,14 @@ Method (FRONTIER_PARITY.md):
 Requires: numpy, sympy, autonomous_proof_engine_v2.py and ai_4_fixed.py in the
 same directory.
 """
+import gzip
 import importlib.util
 import json
 import math
 import os
 import sys
+import time
+import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = sys.argv[1] if len(sys.argv) > 1 else None
@@ -47,6 +50,116 @@ DEFAULT_CORPUS = ("Sparse cortical neurons spike efficiently on frontier CPUs. "
                   "Cortical neurons spike; the brain learns sparse efficient spikes. ") * 12
 RATIONAL_DENOM = 10 ** 6
 EQUALITY_TOL = 10 ** -4
+GLM_SERVER_URL = os.environ.get("GLM_SERVER_URL", "http://127.0.0.1:8011")
+SURROGATE_FLOOR = 10 ** -3
+
+
+class LlamaCppChannel:
+    """Certified ground-truth channel backed by a loopback llama.cpp server
+    running the actual frontier GLM weights (the reference greedy decoder for
+    the hybrid glm5-next GGUF that ExactFrontierEngine refuses by design).
+
+    Channel interface (consumed by _distill_sequence, _measure_positions,
+    _brain_greedy_ids):
+        logprobs(ctx_ids, vocab_size) -> one-hot surrogate at the frontier's
+        greedy token (0.0 there, floor elsewhere; Laplace floor is applied at
+        measurement/certification time).
+    Server-side prompt caching makes growing-prefix teacher forcing cost one
+    forward per position.
+    """
+
+    def __init__(self, base_url=GLM_SERVER_URL, vocab_size=None, eos_ids=(),
+                 timeout=1800, cache_path=None, retries=8):
+        self.base_url = base_url.rstrip("/")
+        self.vocab_size = int(vocab_size)
+        self.eos_ids = set(int(e) for e in eos_ids)
+        self.order = 1
+        self.timeout = int(timeout)
+        self.retries = int(retries)
+        self.cache_path = cache_path
+        self._argmax_cache = {}
+        if cache_path and os.path.exists(cache_path):
+            try:
+                with open(cache_path, "r", encoding="utf-8") as fh:
+                    self._argmax_cache = {
+                        tuple(int(t) for t in k.split(",")): int(v)
+                        for k, v in json.load(fh).items()}
+            except Exception:
+                self._argmax_cache = {}
+
+    def _persist_cache(self):
+        if not self.cache_path:
+            return
+        try:
+            with open(self.cache_path, "w", encoding="utf-8") as fh:
+                json.dump({",".join(map(str, k)): v
+                           for k, v in self._argmax_cache.items()}, fh)
+        except Exception:
+            pass
+
+    def _post(self, path, payload):
+        last = None
+        for attempt in range(self.retries):
+            try:
+                req = urllib.request.Request(
+                    self.base_url + path, data=json.dumps(payload).encode(),
+                    headers={"Content-Type": "application/json"})
+                return json.loads(urllib.request.urlopen(req, timeout=self.timeout).read())
+            except Exception as exc:
+                last = exc
+                time.sleep(15.0 * (attempt + 1))
+        raise last
+
+    def greedy_next(self, ctx_ids):
+        ctx = tuple(int(t) for t in ctx_ids)
+        hit = self._argmax_cache.get(ctx)
+        if hit is not None:
+            return hit
+        resp = self._post("/completion", {
+            "prompt": [int(t) for t in ctx],
+            "temperature": 0.0, "n_predict": 1, "n_probs": 1,
+            "cache_prompt": True,
+        })
+        tid = int(resp["completion_probabilities"][0]["top_logprobs"][0]["id"])
+        self._argmax_cache[ctx] = tid
+        if len(self._argmax_cache) % 16 == 0:
+            self._persist_cache()
+        return tid
+
+    def greedy_stream(self, prompt_ids, max_tokens):
+        gen = []
+        for _ in range(int(max_tokens)):
+            nxt = self.greedy_next(list(prompt_ids) + gen)
+            if nxt in self.eos_ids:
+                break
+            gen.append(nxt)
+        return gen
+
+    def logprobs(self, ctx_ids, vocab_size, floor=-20.0):
+        if int(vocab_size) != self.vocab_size:
+            raise ValueError(f"channel vocab {self.vocab_size} != requested {vocab_size}")
+        lp = np.full(self.vocab_size, floor, dtype=np.float32)
+        lp[self.greedy_next(ctx_ids)] = 0.0
+        return lp
+
+    def reset(self):
+        return None
+
+    def train_ids(self, ids):
+        return self
+
+    def save(self, path):
+        payload = {"type": "LlamaCppChannel", "base_url": self.base_url,
+                   "vocab_size": self.vocab_size, "eos_ids": sorted(self.eos_ids)}
+        try:
+            if str(path).endswith(".gz"):
+                with gzip.open(path, "wt", encoding="utf-8") as fh:
+                    json.dump(payload, fh)
+            else:
+                with open(path, "w", encoding="utf-8") as fh:
+                    json.dump(payload, fh)
+        except Exception:
+            pass
 
 
 def _distill_sequence(vbridge, channel, ids, lr=0.02, ticks_per_token=None,
@@ -134,6 +247,7 @@ def _measure_positions(vbridge, channel, ids, n_positions):
         channel.reset()
     feat = np.zeros(vbridge.feat_dim, dtype=np.float32)
     n = min(int(n_positions), len(ids) - 1)
+    surrogate = hasattr(channel, "greedy_next")
     for i in range(n):
         feat = vbridge._step_token(int(ids[i]), ticks_per_token=4, plasticity=False)
         h = vbridge._project_to_head(feat)
@@ -141,12 +255,16 @@ def _measure_positions(vbridge, channel, ids, n_positions):
         mx = float(logits.max())
         ex = np.exp(logits - mx)
         p_b = max(float(ex[int(ids[i + 1])]) / max(float(ex.sum()), 1e-12), 1e-12)
-        lp = channel.logprobs([int(t) for t in ids[:i + 1]], V)
-        p_a = max(math.exp(float(lp[int(ids[i + 1])])), 1e-12)
+        t_f = channel.greedy_next([int(t) for t in ids[:i + 1]]) if surrogate \
+            else int(np.argmax(channel.logprobs([int(t) for t in ids[:i + 1]], V)))
+        if surrogate:
+            p_a = 1.0 - SURROGATE_FLOOR if int(ids[i + 1]) == t_f else SURROGATE_FLOOR
+        else:
+            p_a = max(math.exp(float(channel.logprobs([int(t) for t in ids[:i + 1]], V)[int(ids[i + 1])])), 1e-12)
         out.append({
             "a": p_a,
             "b": p_b,
-            "t_frontier": int(np.argmax(lp)),
+            "t_frontier": int(t_f),
             "t_cortical": int(np.argmax(logits)),
         })
     return out
@@ -232,15 +350,29 @@ def certify_round(ape_mod, pairs, rnd, tol=EQUALITY_TOL):
     return out
 
 
-def parity_battery(vbridge, channel, exact, prompts, max_tokens, lam=1.0):
-    """Greedy brain-only (lam) vs certified ground-truth channel token streams."""
+def _glm_server_alive(base_url=GLM_SERVER_URL, tries=2):
+    for _ in range(tries):
+        try:
+            with urllib.request.urlopen(base_url.rstrip("/") + "/health", timeout=10) as r:
+                if r.status == 200:
+                    return True
+        except Exception:
+            time.sleep(2)
+    return False
+
+
+def parity_battery(vbridge, channel, exact, prompts, max_tokens, lam=1.0,
+                   gt_reference=None):
+    """Greedy brain-only (lam) vs certified ground-truth channel token streams.
+    prompts: list of (display, prompt_ids) pairs."""
     results = []
     V = vbridge.vocab_size
     eos_ids = vbridge.tokenizer.eos_ids
-    for prompt in prompts:
-        prompt_ids = vbridge.tokenizer.encode(prompt, add_bos=True) or [0]
+    for display, prompt_ids in prompts:
         if exact is not None:
             exact_ids = ai4._exact_greedy_ids(exact, prompt_ids, max_tokens)
+        elif gt_reference is not None:
+            exact_ids = gt_reference.greedy_stream(prompt_ids, max_tokens)
         else:
             exact_ids = _ngram_greedy_ids(channel, prompt_ids, max_tokens, V, eos_ids)
         brain_ids = ai4._brain_greedy_ids(vbridge, channel, prompt_ids, max_tokens, lam)
@@ -249,7 +381,7 @@ def parity_battery(vbridge, channel, exact, prompts, max_tokens, lam=1.0):
         if div is None and len(exact_ids) != len(brain_ids):
             div = min(len(exact_ids), len(brain_ids))
         results.append({
-            "prompt": prompt,
+            "prompt": display,
             "exact": bool(exact_ids == brain_ids),
             "first_divergence": div,
             "model_tokens": [int(t) for t in exact_ids],
@@ -274,7 +406,7 @@ def _ngram_greedy_ids(channel, prompt_ids, max_tokens, vocab_size, eos_ids):
 def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
                         prompt=PROMPT, max_tokens=MAX_TOKENS, n_rounds=N_ROUNDS,
                         cache_ram_mb=512, col_neurons=96, k_synapses=16,
-                        ngram_order=4, max_train_tokens=None,
+                        ngram_order=4, max_train_tokens=None, meas_positions=64,
                         distill_lr=0.02, verbose=True):
     def log(msg):
         if verbose:
@@ -307,20 +439,36 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
             exact = ai4.ExactFrontierEngine.from_model(model_path, cache_ram_mb=cache_ram_mb)
         except NotImplementedError as e:
             log(f"[FPD] ExactFrontierEngine refuses this architecture: {e}")
-            log("[FPD] brain-only mode: ground-truth channel A = corpus n-gram "
-                "(the file's prescribed path for GLM-5-style hybrid models)")
+            if _glm_server_alive(GLM_SERVER_URL):
+                log(f"[FPD] GLM frontier channel: llama.cpp reference server at "
+                    f"{GLM_SERVER_URL} (actual frontier weights, greedy decoding)")
+            else:
+                log("[FPD] no GLM frontier server found -> brain-only mode: "
+                    "ground-truth channel A = corpus n-gram")
         except Exception as e:
             log(f"[FPD] exact engine unavailable ({type(e).__name__}: {e}) -> "
                 "brain-only mode: ground-truth channel A = corpus n-gram")
         if exact is not None and exact.vocab_size != V:
             raise ValueError(f"vocab mismatch: model {exact.vocab_size} vs brain {V}")
-        mode = "exact_ground_truth" if exact is not None else "brain_only_ngram_ground_truth"
-        channel = ai4.ExactModelChannel(exact) if exact is not None else ai4.CorpusNGram(max(1, int(ngram_order)))
+        if exact is not None:
+            mode = "exact_ground_truth"
+            channel = ai4.ExactModelChannel(exact)
+        elif _glm_server_alive(GLM_SERVER_URL):
+            mode = "glm_frontier_channel_llamacpp"
+            channel = LlamaCppChannel(
+                GLM_SERVER_URL, vocab_size=V, eos_ids=vbridge.tokenizer.eos_ids,
+                cache_path=os.path.join(brain_dir, "glm_frontier_argmax_cache.json"))
+        else:
+            mode = "brain_only_ngram_ground_truth"
+            channel = ai4.CorpusNGram(max(1, int(ngram_order)))
 
+        gt_reference = None
+        if exact is None and hasattr(channel, "greedy_next"):
+            gt_reference = channel
         ids = vbridge.tokenizer.encode(corpus_text, add_bos=True)
         split = max(96, int(len(ids) * 0.9))
         train_ids, meas_ids = ids[:split], ids[split:]
-        if exact is None:
+        if exact is None and not hasattr(channel, "greedy_next"):
             channel.train_ids(list(train_ids))
         log(f"[FPD] mode: {mode} | corpus tokens: {len(ids)} "
             f"(train {len(train_ids)}, meas {len(meas_ids)})")
@@ -333,7 +481,7 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
         for rnd in range(1, max(1, int(n_rounds)) + 1):
             round_ids = train_ids[:max_train_tokens] if max_train_tokens else train_ids
             losses = _distill_sequence(vbridge, channel, round_ids, lr=distill_lr)
-            pairs = _measure_positions(vbridge, channel, meas_ids, 64)
+            pairs = _measure_positions(vbridge, channel, meas_ids, meas_positions)
             cert = certify_round(ape, pairs, rnd)
             last_cert = cert
             agree = sum(cert["positions"]["argmax_agree"]) if cert.get("positions") else 0
@@ -344,11 +492,14 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
             round_log.append({"round": rnd, "distill_loss_first": float(losses[0]),
                               "distill_loss_last": float(losses[-1]), **cert})
 
-            prompts = [vbridge.tokenizer.decode(meas_ids[:k]) for k in
-                       (max(1, len(meas_ids) // 4), max(2, len(meas_ids) // 2))] + [prompt]
-            battery = parity_battery(vbridge, channel, exact, prompts, max_tokens, lam=1.0)
+            prompt_ids_user = vbridge.tokenizer.encode(prompt, add_bos=True) or [0]
+            prompts = [(vbridge.tokenizer.decode(meas_ids[:k]), list(meas_ids[:k]))
+                       for k in (12, 24) if k < len(meas_ids)] + [(prompt, prompt_ids_user)]
+            battery = parity_battery(vbridge, channel, exact, prompts, max_tokens,
+                                     lam=1.0, gt_reference=gt_reference)
             battery_ok = all(b["exact"] for b in battery)
-            gt_label = "frontier" if exact is not None else "ngram"
+            gt_label = ("frontier" if exact is not None
+                        else ("GLM-frontier" if gt_reference is not None else "ngram"))
             log(f"[round {rnd}] battery vs certified {gt_label} channel (brain-only lam=1): "
                 f"{sum(1 for b in battery if b['exact'])}/{len(battery)} exact "
                 f"(first divergences: {[b['first_divergence'] for b in battery]})")
@@ -373,13 +524,15 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
                 "production keeps the engine-certified mixture weight "
                 f"lam={lam_production} (parity-by-construction at lam=0)")
 
-        ref_text = vbridge.tokenizer.decode(
-            vbridge.tokenizer.encode(prompt, add_bos=True)
-            + ((_ngram_greedy_ids(channel, vbridge.tokenizer.encode(prompt, add_bos=True) or [0],
-                                  max_tokens, V, vbridge.tokenizer.eos_ids))
-               if exact is None else
-               ai4._exact_greedy_ids(exact, vbridge.tokenizer.encode(prompt, add_bos=True) or [0],
-                                     max_tokens)))
+        prompt_ids = vbridge.tokenizer.encode(prompt, add_bos=True) or [0]
+        if exact is not None:
+            ref_ids = ai4._exact_greedy_ids(exact, prompt_ids, max_tokens)
+        elif gt_reference is not None:
+            ref_ids = gt_reference.greedy_stream(prompt_ids, max_tokens)
+        else:
+            ref_ids = _ngram_greedy_ids(channel, prompt_ids, max_tokens, V,
+                                        vbridge.tokenizer.eos_ids)
+        ref_text = vbridge.tokenizer.decode(list(prompt_ids) + ref_ids)
 
         vbridge.attach_ngram(channel, influence=lam_production)
         brain_text, gen_stats = vbridge.generate_tokens(
@@ -399,13 +552,21 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
             "brain_only_parity_certified": certified_parity,
             "gaps": (["generalization from the parity battery to all possible prompts "
                       "is a declared hypothesis, not a settled theorem"]
-                     + (["exact model inference is refused by ExactFrontierEngine for "
+                     + (["ExactFrontierEngine refuses the hybrid glm5-next graph by "
+                         "design; ground truth = llama.cpp reference greedy decoding of "
+                         "the actual frontier weights"]
+                        if mode == "glm_frontier_channel_llamacpp" else
+                        ["exact model inference is refused by ExactFrontierEngine for "
                          "hybrid glm5-next architectures by design; ground truth = "
                          "certified corpus n-gram"] if exact is None else [])
                      if certified_parity
                      else ["brain-only parity not reached; production lam<1 keeps the "
                            "certified ground-truth channel in the mixture"]
-                     + (["exact model inference is refused by ExactFrontierEngine for "
+                     + (["ExactFrontierEngine refuses the hybrid glm5-next graph by "
+                         "design; ground truth = llama.cpp reference greedy decoding of "
+                         "the actual frontier weights"]
+                        if mode == "glm_frontier_channel_llamacpp" else
+                        ["exact model inference is refused by ExactFrontierEngine for "
                          "hybrid glm5-next architectures by design; ground truth = "
                          "certified corpus n-gram"] if exact is None else [])),
             "reference_text": ref_text,
@@ -421,6 +582,9 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
             json.dump({"model": model_path, "lam": float(lam_production), "mode": mode,
                        "channel": ("ExactModelChannel (ground truth = source model)"
                                    if exact is not None else
+                                   "LlamaCppChannel (ground truth = llama.cpp reference "
+                                   "greedy decoding of the frontier weights)"
+                                   if gt_reference is not None else
                                    "CorpusNGram (ground truth = certified corpus n-gram)")}, fh)
         vbridge.save(brain_dir)
         log(f"[FPD] certificate written to "
