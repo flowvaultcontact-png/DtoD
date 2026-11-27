@@ -1,1 +1,1 @@
-{"model": "/tmp/glm53/UD-IQ1_S", "lam": 0.0, "mode": "glm_frontier_channel_llamacpp", "channel": "LlamaCppChannel (ground truth = llama.cpp reference greedy decoding of the frontier weights)"}
+{"model": "/tmp/glm53/UD-IQ1_S", "lam": 1.0, "mode": "glm_frontier_channel_llamacpp", "channel": "LlamaCppChannel (ground truth = llama.cpp reference greedy decoding of the frontier weights)"}

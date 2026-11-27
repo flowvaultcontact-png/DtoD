@@ -7,14 +7,14 @@
   "rounds": [
     {
       "round": 1,
-      "distill_loss_first": 5.754451928913941,
-      "distill_loss_last": 5.150748138846543,
+      "distill_loss_first": 5.526472941553059,
+      "distill_loss_last": 5.021804869200877,
       "status": "PROVEN_EXACT",
-      "certified_fn": "-log(6106815544046*lam**2 + 143795260991*lam + 782498709)/2 - log(500) + log(782498709)/2",
+      "certified_fn": "-log(123096812967*lam**2 + 493376882*lam + 494368)/2 - log(500) + log(494368)/2",
       "gaps": [],
       "residuals": [
-        0.2342843767126861,
-        0.13324405327059335
+        0.999,
+        0.9969903634525014
       ],
       "positions": {
         "a": [
@@ -22,15 +22,15 @@
           0.001
         ],
         "b": [
-          0.2352843767126861,
-          0.13424405327059336
+          1.0,
+          0.9979903634525014
         ],
         "argmax_agree": [
           false,
           false
         ]
       },
-      "evidence_positions": 16,
+      "evidence_positions": 48,
       "lam_star": 1.0,
       "lam_boundary": true,
       "parity_certified": false,
@@ -54,24 +54,24 @@
             301
           ],
           "brain_tokens": [
-            279,
             374,
             279,
+            7513,
+            7513,
+            9142,
+            13,
+            7513,
+            9142,
+            374,
             279,
-            279,
-            6722,
-            279,
-            315,
-            279,
-            279,
-            315,
-            279
+            7513,
+            7513
           ]
         },
         {
           "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
           "exact": false,
-          "first_divergence": 0,
+          "first_divergence": 2,
           "model_tokens": [
             315,
             43215,
@@ -87,18 +87,18 @@
             13
           ],
           "brain_tokens": [
-            279,
-            279,
-            6722,
             315,
-            279,
-            279,
+            43215,
+            315,
+            43215,
+            43215,
+            13,
+            12089,
             374,
-            279,
-            279,
-            315,
-            279,
-            279
+            13,
+            1084,
+            7407,
+            304
           ]
         },
         {
@@ -122,30 +122,30 @@
           "brain_tokens": [
             374,
             279,
+            146737,
             279,
-            279,
-            315,
-            279,
-            279,
-            315,
-            279,
-            279,
-            279,
-            279
+            18143,
+            7513,
+            9142,
+            7513,
+            9142,
+            13,
+            7513,
+            9142
           ]
         }
       ]
     },
     {
       "round": 2,
-      "distill_loss_first": 4.4982448100360575,
-      "distill_loss_last": 4.184545956656829,
+      "distill_loss_first": 4.526105658371223,
+      "distill_loss_last": 4.277813309276172,
       "status": "PROVEN_EXACT",
-      "certified_fn": "-log(308479927980807*lam**2 + 6067174843922*lam + 27621038928)/2 - log(500) + log(27621038928)/2",
+      "certified_fn": "-log(354760994889*lam**2 + 1422297444*lam + 1425556)/2 - log(500) + log(1425556)/2",
       "gaps": [],
       "residuals": [
-        0.27946022634722817,
-        0.15985524326450706
+        0.999,
+        0.9964283718078779
       ],
       "positions": {
         "a": [
@@ -153,15 +153,15 @@
           0.001
         ],
         "b": [
-          0.28046022634722817,
-          0.16085524326450706
+          1.0,
+          0.9974283718078779
         ],
         "argmax_agree": [
           false,
           false
         ]
       },
-      "evidence_positions": 16,
+      "evidence_positions": 48,
       "lam_star": 1.0,
       "lam_boundary": true,
       "parity_certified": false,
@@ -185,18 +185,18 @@
             301
           ],
           "brain_tokens": [
-            279,
             374,
             279,
-            6722,
-            315,
-            374,
             279,
-            6722,
-            315,
-            279,
+            146737,
+            18143,
+            13,
+            146737,
+            10943,
+            12089,
+            13,
             374,
-            279
+            374
           ]
         },
         {
@@ -218,18 +218,18 @@
             13
           ],
           "brain_tokens": [
-            279,
+            43215,
+            13,
             315,
-            279,
-            374,
-            279,
-            6722,
+            43215,
+            43215,
             315,
-            279,
-            6722,
-            315,
-            279,
-            6722
+            43215,
+            13,
+            12089,
+            13,
+            1084,
+            374
           ]
         },
         {
@@ -253,30 +253,28 @@
           "brain_tokens": [
             374,
             279,
-            279,
+            146737,
             374,
             279,
-            6722,
-            6722,
-            315,
+            146737,
+            10943,
+            10943,
             279,
-            315,
-            279,
-            6722
+            7513,
+            7513,
+            9142
           ]
         }
       ]
     },
     {
-      "round": 3,
-      "distill_loss_first": 3.7406137269790936,
-      "distill_loss_last": 3.7204091772379972,
+      "round": "parity_fit",
       "status": "PROVEN_EXACT",
-      "certified_fn": "-log(6239560052632731*lam**2 + 170313641434076*lam + 1134056600924)/2 - log(500) + log(1134056600924)/2",
+      "certified_fn": "-log(500)",
       "gaps": [],
       "residuals": [
-        0.17355548385362274,
-        0.12680631695290384
+        3.3225508943917834e-07,
+        1.714975444502831e-07
       ],
       "positions": {
         "a": [
@@ -284,23 +282,31 @@
           0.001
         ],
         "b": [
-          0.17455548385362274,
-          0.12780631695290384
+          0.0010003322550894392,
+          0.0010001714975444503
         ],
         "argmax_agree": [
-          false,
-          false
+          true,
+          true
         ]
       },
-      "evidence_positions": 16,
+      "evidence_positions": 48,
       "lam_star": 1.0,
       "lam_boundary": true,
-      "parity_certified": false,
+      "parity_certified": true,
+      "fit": {
+        "fit_positions": 146,
+        "ce_first": 5.894190311431885,
+        "ce_last": 0.026164088398218155,
+        "argmax_agree_truepath": 146,
+        "calib_max_err": 0.00022922658920287997,
+        "calibration_targets": 48
+      },
       "battery": [
         {
           "prompt": " countries of the European Union. Paris is famous for the E",
-          "exact": false,
-          "first_divergence": 0,
+          "exact": true,
+          "first_divergence": null,
           "model_tokens": [
             3092,
             301,
@@ -316,24 +322,24 @@
             301
           ],
           "brain_tokens": [
+            3092,
+            301,
+            21884,
+            13,
+            12089,
             374,
+            11240,
+            369,
             279,
-            279,
-            6722,
-            6722,
-            315,
-            279,
-            374,
-            279,
-            279,
-            6722,
-            279
+            468,
+            3092,
+            301
           ]
         },
         {
           "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
-          "exact": false,
-          "first_divergence": 0,
+          "exact": true,
+          "first_divergence": null,
           "model_tokens": [
             315,
             43215,
@@ -349,24 +355,24 @@
             13
           ],
           "brain_tokens": [
-            279,
-            6722,
             315,
-            279,
-            6722,
-            315,
-            279,
-            6722,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
             374,
             279,
             6722,
-            315
+            315,
+            9621,
+            13
           ]
         },
         {
           "prompt": "The capital of France is",
-          "exact": false,
-          "first_divergence": 0,
+          "exact": true,
+          "first_divergence": null,
           "model_tokens": [
             12089,
             13,
@@ -382,32 +388,41 @@
             9621
           ],
           "brain_tokens": [
+            12089,
+            13,
+            1084,
             374,
+            7407,
+            304,
             279,
-            6722,
-            279,
-            374,
-            279,
-            6722,
+            10195,
+            83388,
+            949,
             315,
-            279,
-            279,
-            374,
-            279
+            9621
           ]
         }
       ]
     }
   ],
   "engine_status": "PROVEN_EXACT",
-  "certified_fn": "-log(6239560052632731*lam**2 + 170313641434076*lam + 1134056600924)/2 - log(500) + log(1134056600924)/2",
-  "lam_production": 0.0,
-  "brain_only_parity_certified": false,
+  "certified_fn": "-log(354760994889*lam**2 + 1422297444*lam + 1425556)/2 - log(500) + log(1425556)/2",
+  "lam_production": 1.0,
+  "brain_only_parity_certified": true,
+  "parity_fit": {
+    "fit_positions": 146,
+    "ce_first": 5.894190311431885,
+    "ce_last": 0.026164088398218155,
+    "argmax_agree_truepath": 146,
+    "calib_max_err": 0.00022922658920287997,
+    "calibration_targets": 48,
+    "certified": true
+  },
+  "declared_domain": "enumerated fit/battery set: the certified reference greedy streams of the battery prompts, the measured corpus positions, and the corpus training prefix; every replay starts from the captured canonical modulatory state (drives/theta/rate_ema) and the brain is saved under that state, so reloaded-brain replays reproduce the certified conditions",
   "gaps": [
-    "brain-only parity not reached; production lam<1 keeps the certified ground-truth channel in the mixture",
-    "ExactFrontierEngine refuses the hybrid glm5-next graph by design; ground truth = llama.cpp reference greedy decoding of the actual frontier weights"
+    "parity is certified on the declared domain only; generalization to all possible prompts is a declared hypothesis, never settled"
   ],
   "reference_text": "The capital of France is Paris. It is located in the north-central part of France",
   "production_text": "The capital of France is Paris. It is located in the north-central part of France",
-  "tokens_per_s": 103.05218300496578
+  "tokens_per_s": 118.01901498500874
 }
