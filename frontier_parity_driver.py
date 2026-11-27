@@ -422,6 +422,7 @@ def run_frontier_parity(model_path, brain_dir=None, corpus_text=None,
                        "channel": ("ExactModelChannel (ground truth = source model)"
                                    if exact is not None else
                                    "CorpusNGram (ground truth = certified corpus n-gram)")}, fh)
+        vbridge.save(brain_dir)
         log(f"[FPD] certificate written to "
             f"{os.path.join(brain_dir, 'frontier_parity_certificate.json')}")
         log(f"\n=== BRAIN (production lam={lam_production}) ===\n{brain_text}")

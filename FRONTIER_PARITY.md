@@ -100,7 +100,26 @@ records battery size, token streams, and first divergence.
         [prompt] [max_tokens] [rounds]
 
 Requires the model weights the brain was converted from (or a convertible
-model directory / GGUF). `ExactFrontierEngine` refuses hybrid GLM-5 GGUF
-architectures by design; in that case there is no exact frontier channel and
-the driver exits with the honest brain-only gap (same policy as
-`run_automeness_proof`).
+model directory / GGUF). Two modes:
+
+* **exact mode** (dense/safetensors or non-hybrid GGUF): ground truth =
+  `ExactModelChannel` over `ExactFrontierEngine`; the battery compares the
+  brain against the frontier model itself.
+* **brain-only mode** (hybrid `glm5-next` GGUF, e.g. GLM-5.3-Flash):
+  `ExactFrontierEngine` refuses the hybrid graph by design; ground truth =
+  certified corpus n-gram (`CorpusNGram`), same policy as
+  `run_automeness_proof`. The certificate records this as an explicit gap.
+
+## 7. GLM-5.3-Flash result (real weights)
+
+Run on the actual [unsloth/GLM-5.3-Flash-GGUF](https://huggingface.co/unsloth/GLM-5.3-Flash-GGUF)
+`UD-IQ1_S` shards (93.1 GB), converted brain shared in `glm53-flash-brain/`:
+
+* conversion: 7,616 neurons, 164,801 synapses, 53 MB (col_neurons=128,
+  k_synapses=16), hybrid folds recorded in `hybrid_coverage.json`;
+* 6 FPD rounds: distillation CE 5.65 -> 4.11 nats, residuals measured exactly,
+  round 1 certified PROVEN_EXACT with boundary optimum lam* = 0.0;
+* brain-only battery parity not reached within the round budget: production
+  keeps lam = 0 (parity-by-construction through the certified channel);
+  the honest tier and all gaps are recorded in
+  `glm53-flash-brain/frontier_parity_certificate.json`.
