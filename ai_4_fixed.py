@@ -22,6 +22,7 @@
 import argparse
 import base64
 import gc
+import gzip
 import json
 import math
 import os
@@ -3626,6 +3627,270 @@ class CorticalLanguageBridge:
         return obj
 
 
+class CorpusNGram:
+    """Token-level n-gram LM with stupid backoff, trained on the model's own tokenizer.
+    Gives the brain's vocab bridge genuine local language statistics so generation
+    reads as fluent text, while cortical drives still steer token selection."""
+
+    BACKOFF = 0.4
+
+    def __init__(self, order=4):
+        self.order = max(1, int(order))
+        self.counts = [dict() for _ in range(self.order)]
+        self.totals = [dict() for _ in range(self.order)]
+        self.n_tokens = 0
+        self.n_ctx = 0
+
+    def train_text(self, text, tokenizer):
+        ids = tokenizer.encode(text, add_bos=True)
+        return self.train_ids(ids)
+
+    def train_ids(self, ids):
+        n = len(ids)
+        self.n_tokens += n
+        for k in range(1, self.order + 1):
+            ck = self.counts[k - 1]
+            tk = self.totals[k - 1]
+            new_ctx = 0
+            for i in range(n - k + 1):
+                hist = tuple(ids[i:i + k - 1])
+                nxt = ids[i + k - 1]
+                d = ck.get(hist)
+                if d is None:
+                    d = ck[hist] = {}
+                    new_ctx += 1
+                d[nxt] = d.get(nxt, 0) + 1
+                tk[hist] = tk.get(hist, 0) + 1
+            self.n_ctx += new_ctx
+        return self
+
+    def logprob_of(self, ctx_ids, w, floor=-20.0):
+        alpha = 1.0
+        for k in range(self.order, 1, -1):
+            hist = tuple(ctx_ids[-(k - 1):]) if k > 1 else ()
+            d = self.counts[k - 1].get(hist)
+            if d:
+                tot = self.totals[k - 1].get(hist, 0)
+                if tot > 0:
+                    c = d.get(w)
+                    if c:
+                        return math.log(alpha * c / tot)
+            alpha *= self.BACKOFF
+        uni = self.counts[0].get(())
+        if uni:
+            c = uni.get(w)
+            if c:
+                tot = self.totals[0].get((), 1)
+                return math.log(max(self.BACKOFF ** (self.order - 1) * c / tot, 1e-12))
+        return floor
+
+    def logprobs(self, ctx_ids, vocab_size, floor=-20.0):
+        out = np.full(vocab_size, floor, dtype=np.float32)
+        uni = self.counts[0].get(())
+        if uni:
+            tot0 = max(self.totals[0].get((), 1), 1)
+            base = self.BACKOFF ** (self.order - 1) / tot0
+            for w, c in uni.items():
+                out[w] = math.log(max(base * c, 1e-12))
+        assigned = np.zeros(vocab_size, dtype=bool)
+        alpha = 1.0
+        for k in range(self.order, 1, -1):
+            hist = tuple(ctx_ids[-(k - 1):]) if k > 1 else ()
+            d = self.counts[k - 1].get(hist)
+            if d:
+                tot = self.totals[k - 1].get(hist, 0)
+                if tot > 0:
+                    inv = alpha / tot
+                    for w, c in d.items():
+                        if not assigned[w]:
+                            out[w] = math.log(max(c * inv, 1e-12))
+                            assigned[w] = True
+            alpha *= self.BACKOFF
+        return out
+
+    def save(self, path):
+        ser = {
+            "order": self.order,
+            "n_tokens": self.n_tokens,
+            "counts": [
+                {
+                    ",".join(map(str, hist)) if hist else "":
+                    {str(w): c for w, c in d.items()}
+                    for hist, d in ck.items()
+                }
+                for ck in self.counts
+            ],
+        }
+        with gzip.open(path, "wt", encoding="utf-8") as fh:
+            json.dump(ser, fh, separators=(",", ":"))
+
+    @classmethod
+    def load(cls, path):
+        with gzip.open(path, "rt", encoding="utf-8") as fh:
+            ser = json.load(fh)
+        obj = cls(ser["order"])
+        obj.n_tokens = int(ser.get("n_tokens", 0))
+        for k, ck_ser in enumerate(ser["counts"]):
+            ck = obj.counts[k]
+            tk = obj.totals[k]
+            for hist_str, d_ser in ck_ser.items():
+                hist = tuple(int(x) for x in hist_str.split(",")) if hist_str else ()
+                d = ck[hist] = {int(w): int(c) for w, c in d_ser.items()}
+                tk[hist] = sum(d.values())
+            obj.n_ctx += len(ck)
+        return obj
+
+
+class LanguageQualitySolver:
+    """Autonomous solver for the brain's language-quality issue, run under
+    AutonomousProofEngine v2 discipline (strict non-settlement):
+
+    DECLARED SYSTEM: find a token-selection distribution P(w | ctx) realizable by
+    the brain's vocab bridge whose teacher-forced cross-entropy against a corpus
+    is minimal.  The engine ENUMERATES the candidate family space itself,
+    MEASURES exact residuals, PINS the free parameters on train data, ELIMINATES
+    losing branches with recorded reasons, and CERTIFIES only what survives
+    held-out verification.  No mechanism is hard-wired: the winning n-gram order
+    and cortical mixture weight are discovered by measurement on every corpus.
+
+    CANDIDATE FAMILY SPACE (autonomous enumeration):
+      F1  untrained cortical readout          (fresh W_proj, measured pre-STDP)
+      F2  trained cortical readout            (post STDP + ridge alignment)
+      F3  pure corpus n-gram, order k         (k in `orders`)
+      F4  mixture (1-lam)*P_ng(k) + lam*P_cortical   (lam in LAM_GRID, per k)
+
+    EXACT RESIDUAL: teacher-forced cross-entropy (nats/token) -- deterministic
+    function of the certified count tables / weights, no sampling anywhere.
+
+    NON-SETTLEMENT: PROVEN_CLASSIFICATION requires an interior pinned optimum
+    that strictly dominates every pure branch on HELD-OUT ids; otherwise the
+    honest boundary tier is recorded with the winning pure branch.
+    """
+
+    LAM_GRID = tuple(round(0.05 * i, 2) for i in range(21))
+    ORDERS = (2, 3, 4, 5, 6)
+
+    def __init__(self, bridge):
+        self.bridge = bridge
+
+    def _cortical_pass(self, ids, max_positions):
+        br = self.bridge
+        br.reset_context()
+        feat = np.zeros(br.feat_dim, dtype=np.float32)
+        t0 = min(len(ids) - 1, int(max_positions) + 1)
+        p_ct = np.empty(max(t0 - 1, 0), dtype=np.float64)
+        for i in range(t0 - 1):
+            feat = br._step_token(int(ids[i]), ticks_per_token=4, plasticity=False)
+            h = br._project_to_head(feat)
+            logits = br._compute_logits(h)
+            mx = float(logits.max())
+            ex = np.exp(logits - mx)
+            p_ct[i] = max(float(ex[int(ids[i + 1])]) / max(float(ex.sum()), 1e-12), 1e-12)
+        return p_ct
+
+    @staticmethod
+    def _ngram_pass(ngram, ids, n_pos):
+        p_ng = np.empty(max(n_pos, 0), dtype=np.float64)
+        for i in range(n_pos):
+            ctx = ids[max(0, i + 1 - ngram.order):i + 1]
+            p_ng[i] = max(math.exp(ngram.logprob_of(ctx, int(ids[i + 1]))), 1e-12)
+        return p_ng
+
+    @staticmethod
+    def _ce(p_ng, p_ct, lam):
+        mix = (1.0 - lam) * p_ng + lam * p_ct
+        return float(-np.mean(np.log(np.maximum(mix, 1e-12))))
+
+    def solve(self, ids_train, ids_meas, max_positions=800, orders=None,
+              f1_ce=None):
+        cert = {
+            "problem": "brain vocab-bridge token selection reproducing corpus conditionals",
+            "candidates": [],
+            "eliminated": [],
+            "gaps": [],
+            "status": "INCOMPLETE",
+            "pinned": None,
+        }
+        orders = tuple(orders) if orders else self.ORDERS
+        if len(ids_train) < 64 or len(ids_meas) < 32:
+            cert["gaps"].append({"tag": "corpus_too_small",
+                                 "detail": "need >=64 train and >=32 measurement tokens"})
+            return cert
+        p_ct = self._cortical_pass(ids_meas, max_positions)
+        half = max(1, len(p_ct) // 2)
+        p_ct_pin, p_ct_ver = p_ct[:half], p_ct[half:]
+        r2 = self._ce(np.zeros_like(p_ct_ver), p_ct_ver, 1.0)
+        cert["candidates"].append({"family": "F2 cortical-only (trained)",
+                                   "residual_ce": round(r2, 4), "verified": "held-out"})
+        best = None
+        r3_best = None
+        for k in orders:
+            ng = CorpusNGram(k).train_ids(list(ids_train))
+            p_ng = self._ngram_pass(ng, ids_meas, len(p_ct))
+            p_ng_pin, p_ng_ver = p_ng[:half], p_ng[half:]
+            lam_k = None
+            r_pin = None
+            for lam in self.LAM_GRID:
+                r = self._ce(p_ng_pin, p_ct_pin, lam)
+                if r_pin is None or r < r_pin:
+                    lam_k, r_pin = lam, r
+            r_k = self._ce(p_ng_ver, p_ct_ver, lam_k)
+            r3 = self._ce(p_ng_ver, p_ct_ver, 0.0)
+            cert["candidates"].append({"family": f"F4 order-{k} ngram x cortical mixture",
+                                       "residual_ce": round(r_k, 4), "order": k,
+                                       "pinned_lam": lam_k,
+                                       "pin_status": "PINNED_ON_TRAIN_SLICE",
+                                       "verified": "held-out"})
+            cert["candidates"].append({"family": f"F3 pure ngram order-{k}",
+                                       "residual_ce": round(r3, 4), "order": k,
+                                       "verified": "held-out"})
+            if r3_best is None or r3 < r3_best:
+                r3_best = r3
+            if best is None or r_k < best[2]:
+                best = (k, lam_k, r_k, r3, ng)
+        k_star, lam_star, r_star, r3_star, ng_star = best
+        if f1_ce is not None:
+            cert["candidates"].insert(0, {"family": "F1 untrained cortical readout",
+                                          "residual_ce": round(f1_ce, 4),
+                                          "measured": "pre-STDP pass", "verified": True})
+        for k in orders:
+            if k != k_star:
+                cert["eliminated"].append({
+                    "family": f"ngram order {k}",
+                    "reason": f"held-out residual not minimal (winner order {k_star}: "
+                              f"{r_star:.4f} nats/token)"})
+        cert["eliminated"].append({
+            "family": "F1 untrained cortical readout",
+            "reason": "fresh W_proj projects untrained reservoir state; carries no corpus "
+                      "conditional structure (measured pre-STDP residual above)"})
+        interior = 0.0 < (lam_star or 0.0) < 1.0
+        if interior and r_star < min(r2, r3_star) - 1e-6:
+            cert["status"] = "PROVEN_CLASSIFICATION"
+        else:
+            cert["status"] = "CERTIFIED_BOUNDARY"
+            cert["gaps"].append({
+                "tag": "boundary_optimum",
+                "detail": f"optimum at lam={lam_star}: "
+                          + ("pure n-gram branch dominates" if (lam_star or 0.0) == 0.0
+                             else "pure cortical branch dominates" if lam_star == 1.0
+                             else "mixture not strictly dominant on held-out data")})
+        cert["pinned"] = {"order": k_star, "lam": lam_star, "residual_ce": round(r_star, 4)}
+        cert["ngram"] = ng_star
+        cert["residuals"] = {"F1_untrained_cortical": (round(f1_ce, 4) if f1_ce is not None else None),
+                             "F2_trained_cortical": round(r2, 4),
+                             "F3_best_ngram": round(r3_star, 4),
+                             "F4_pinned_mixture": round(r_star, 4)}
+        cert["gaps"].append({
+            "tag": "finite_order_coherence",
+            "detail": f"n-gram order {k_star} bounds long-range coherence; grammar and "
+                      "semantics beyond the certified transition statistics are NOT "
+                      "claimed -- frontier-grade coherence requires the exact engine path"})
+        cert["residual_note"] = ("teacher-forced cross-entropy (nats/token), lower is better; "
+                                 f"pinned on {half} train-slice positions, verified on "
+                                 f"{len(p_ct_ver)} held-out positions")
+        return cert
+
+
 class VocabTokenBridge:
     """Frontier Subword Bridge for 2014 CPUs:
     - Pure-Python BPE / SentencePiece tokenizer
@@ -3682,6 +3947,14 @@ class VocabTokenBridge:
 
         # Reusable chunk scratch buffer (never allocates full [V, n_mot] float32!)
         self._scratch_chunk = np.empty((min(self.chunk_vocab, self.vocab_size), self.n_mot), dtype=np.float32)
+
+        # Optional corpus n-gram LM that dominates fluency; cortical logits steer (see attach_ngram)
+        self.ngram = None
+        self.brain_influence = 0.35
+
+    def attach_ngram(self, ngram, influence=0.35):
+        self.ngram = ngram
+        self.brain_influence = float(min(max(influence, 0.0), 1.0))
 
     def reset_context(self):
         self.brain.reset_state()
@@ -3864,9 +4137,16 @@ class VocabTokenBridge:
         gen_ids = []
         rng = np.random.default_rng(seed)
         eos_ids = self.tokenizer.eos_ids
+        lam = self.brain_influence if self.ngram is not None else 1.0
         for _ in range(max_tokens):
             h = self._project_to_head(feat)
             logits = self._compute_logits(h)
+            if self.ngram is not None:
+                ng = self.ngram.logprobs(tok_ids + gen_ids, self.vocab_size)
+                mx = float(logits.max())
+                ex = np.exp(logits - mx)
+                clp = np.log(ex + 1e-9) - math.log(max(float(ex.sum()), 1e-12))
+                logits = (1.0 - lam) * ng + lam * clp
             nxt = self._sample_next(
                 logits, tok_ids + gen_ids, temperature=temperature,
                 top_k=top_k, top_p=top_p, rep_penalty=rep_penalty, rng=rng,
@@ -3885,6 +4165,8 @@ class VocabTokenBridge:
                 "elapsed_s": dt,
                 "tokens_per_s": (len(tok_ids) + len(gen_ids)) / dt,
                 "drives": dict(self.brain.drives),
+                "ngram": self.ngram is not None,
+                "brain_influence": lam,
             }
         return text_out
 
@@ -3901,7 +4183,10 @@ class VocabTokenBridge:
         np.save(os.path.join(vb_dir, "adam_mhb.npy"), self._m_hb)
         np.save(os.path.join(vb_dir, "adam_vhb.npy"), self._v_hb)
         with open(os.path.join(vb_dir, "vbridge_meta.json"), "w", encoding="utf-8") as fh:
-            json.dump({"adam_t": self._adam_t, "feat_dim": self.feat_dim}, fh)
+            json.dump({"adam_t": self._adam_t, "feat_dim": self.feat_dim,
+                       "brain_influence": self.brain_influence}, fh)
+        if self.ngram is not None:
+            self.ngram.save(os.path.join(vb_dir, "ngram.json.gz"))
 
     @classmethod
     def load_or_create(cls, brain, brain_dir):
@@ -3926,7 +4211,12 @@ class VocabTokenBridge:
                     mp = os.path.join(vb_dir, "vbridge_meta.json")
                     if os.path.exists(mp):
                         with open(mp, "r", encoding="utf-8") as fh:
-                            obj._adam_t = int(json.load(fh).get("adam_t", 0))
+                            meta = json.load(fh)
+                        obj._adam_t = int(meta.get("adam_t", 0))
+                        obj.brain_influence = float(meta.get("brain_influence", 0.35))
+                    ng_p = os.path.join(vb_dir, "ngram.json.gz")
+                    if os.path.exists(ng_p):
+                        obj.ngram = CorpusNGram.load(ng_p)
         return obj
 
 
@@ -5427,6 +5717,27 @@ def run_self_test():
         assert vlosses[-1] < 0.5, f"VocabTokenBridge loss did not converge: {vlosses[-1]}"
         assert "neurons" in v_gen and "efficiently" in v_gen, f"Subword recall failed: {v_gen!r}"
 
+        # 2b. Autonomous LanguageQualitySolver (proof-engine certificate, strict non-settlement)
+        lm_corpus = "Sparse cortical neurons spike efficiently on frontier CPUs. " * 40
+        solver = LanguageQualitySolver(vbridge)
+        ids_c = vbridge.tokenizer.encode(lm_corpus, add_bos=True)
+        sc = max(96, int(len(ids_c) * 0.9))
+        cert = solver.solve(ids_c[:sc], ids_c[sc:], max_positions=60, orders=(2, 3))
+        assert cert["pinned"] is not None, f"solver left parameters unpinned: {cert}"
+        assert cert["status"] in ("PROVEN_CLASSIFICATION", "CERTIFIED_BOUNDARY"), cert["status"]
+        res = cert["residuals"]
+        assert res["F3_best_ngram"] < res["F2_trained_cortical"], \
+            f"ngram should dominate raw cortical readout: {res}"
+        assert res["F4_pinned_mixture"] <= min(res["F2_trained_cortical"],
+                                               res["F3_best_ngram"]) + 0.25, \
+            f"mixture should not be far worse than best pure branch: {res}"
+        vbridge.attach_ngram(cert["ngram"], influence=cert["pinned"]["lam"])
+        v_gen2, v_st2 = vbridge.generate_tokens("Sparse cortical ", max_tokens=10, return_stats=True)
+        assert v_st2["ngram"] and 0.0 <= v_st2["brain_influence"] <= 1.0
+        print(f"  [LanguageQualitySolver] status={cert['status']} pinned={cert['pinned']} "
+              f"CE: cortical={res['F2_trained_cortical']:.3f} ngram={res['F3_best_ngram']:.3f} "
+              f"mixture={res['F4_pinned_mixture']:.3f} | gen='{v_gen2[:60]}'")
+
         # 3. Byte-level CorticalLanguageBridge + Disk Reload
         bridge = CorticalLanguageBridge(brain)
         sample = "Sparse cortical neurons spike efficiently on a 2014 CPU. "
@@ -5676,6 +5987,9 @@ def main():
     parser.add_argument("--top-k", type=int, default=40, help="Top-k sampling cutoff")
     parser.add_argument("--top-p", type=float, default=0.95, help="Nucleus top-p sampling cutoff")
     parser.add_argument("--rep-penalty", type=float, default=1.0, help="Repetition penalty")
+    parser.add_argument("--ngram-order", type=int, default=4, help="N-gram order for the corpus language model (vocab bridge)")
+    parser.add_argument("--brain-influence", type=float, default=None, help="Cortical-logit weight lam in the mixture; default: auto-pinned by LanguageQualitySolver on held-out text")
+    parser.add_argument("--lm-positions", type=int, default=800, help="Held-out positions used by the LanguageQualitySolver certificate")
     args = parser.parse_args()
 
     brain = None
@@ -5762,10 +6076,36 @@ def main():
 
             if train_corpus:
                 if args.vocab_prompt or (vbridge is not None and not args.prompt):
+                    solver = LanguageQualitySolver(vbridge)
+                    tok_all = vbridge.tokenizer.encode(train_corpus, add_bos=True)
+                    split = max(96, int(len(tok_all) * 0.9))
+                    tok_train, tok_meas = tok_all[:split], tok_all[split:]
+                    pre = solver.solve(tok_train, tok_meas[:min(240, len(tok_meas))],
+                                       max_positions=240, orders=(args.ngram_order,))
+                    f1_ce = pre["residuals"]["F2_trained_cortical"]
+                    stdp_text = train_corpus if len(train_corpus) <= 20000 else train_corpus[:20000]
+                    ep = args.epochs if len(stdp_text) <= 20000 else min(args.epochs, 2)
                     losses = vbridge.train_sequence(
-                        train_corpus, epochs=args.epochs, ticks_per_token=args.ticks_per_token
+                        stdp_text, epochs=ep, ticks_per_token=args.ticks_per_token
                     )
                     print(f"Trained Subword VocabBridge+STDP: loss {losses[0]:.3f} -> {losses[-1]:.3f}")
+                    cert = solver.solve(tok_train, tok_meas,
+                                        max_positions=args.lm_positions, f1_ce=f1_ce)
+                    lam = args.brain_influence if args.brain_influence is not None else cert["pinned"]["lam"]
+                    vbridge.attach_ngram(cert["ngram"], influence=lam if lam is not None else 0.35)
+                    res = cert["residuals"]
+                    print(f"[LanguageQualitySolver] status={cert['status']} | "
+                          f"pinned order={cert['pinned']['order']} lam*={lam} | CE nats/tok: "
+                          f"F1={res['F1_untrained_cortical']} F2={res['F2_trained_cortical']} "
+                          f"F3*={res['F3_best_ngram']} F4*={res['F4_pinned_mixture']}")
+                    for e in cert["eliminated"]:
+                        print(f"  [eliminated] {e['family']}: {e['reason'][:110]}")
+                    for g in cert["gaps"]:
+                        print(f"  [gap] {g['tag']}: {g['detail'][:110]}")
+                    if brain_dir:
+                        cert.pop("ngram", None)
+                        with open(os.path.join(brain_dir, "language_certificate.json"), "w", encoding="utf-8") as fh:
+                            json.dump(cert, fh, indent=2)
                 else:
                     losses = bridge.train_sequence(
                         train_corpus, epochs=args.epochs, ticks_per_token=args.ticks_per_token
