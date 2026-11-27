@@ -2221,6 +2221,13 @@ class LLMToBrainConverter:
             has_gguf = any(f.endswith(".gguf") for f in os.listdir(model_path))
             if has_gguf and not has_st:
                 is_gguf = True
+            if not has_st and not has_gguf:
+                raise FileNotFoundError(
+                    f"No .safetensors or .gguf weight files found in '{model_path}' -- "
+                    "point --automeness/--convert-model at the directory that directly "
+                    "contains the GLM-5.3-Flash GGUF shards (e.g. the folder holding "
+                    "GLM-5.3-Flash-UD-IQ1_M-00001-of-00003.gguf), or at a HuggingFace "
+                    "safetensors directory containing config.json")
         if is_gguf:
             return cls.convert_gguf(model_path, out_dir=out_dir, col_neurons=col_neurons,
                                     k_synapses=k_synapses, max_ram_mb=max_ram_mb,
