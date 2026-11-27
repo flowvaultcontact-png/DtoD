@@ -1,0 +1,24 @@
+{
+  "problem": "3D Navier-Stokes global regularity | context only",
+  "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
+  "certified_fn": null,
+  "elapsed_s": 0.0,
+  "axioms": [],
+  "gaps": [
+    {
+      "tag": "structural_pde",
+      "detail": "constraint field is a multi-dimensional PDE; no SymPy ODE/algebraic elimination tactic can close it"
+    }
+  ],
+  "machinery": [],
+  "discovered": [],
+  "derived_conditions": [],
+  "candidates": [],
+  "eliminated_branches": [],
+  "consistency_checks": [],
+  "derivation_chain": [],
+  "tactic_notes": [],
+  "proof_obligations_for_formal_kernel": [
+    "Discharge every listed unsettled gap in a formal kernel before any certification claim is admissible."
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "problem": "Disease dynamics | capacity-limited progression D' = k D (1 - D/K)",
+  "status": "PROVEN_CLASSIFICATION",
+  "certified_fn": null,
+  "elapsed_s": 3.8,
+  "axioms": [],
+  "gaps": [],
+  "machinery": [
+    "general ODE solution theory (dsolve)"
+  ],
+  "discovered": [
+    {
+      "formula": "Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*k*(K - _a0)/K', 'a2': '_a0*k**2*(K**2 - 3*K*_a0 + 2*_a0**2)/(2*K**2)', 'a3': '_a0*k**3*(K**3 - 7*K**2*_a0 + 12*K*_a0**2 - 6*_a0**3)/(6*K**3)', 'a4': '_a0*k**4*(K**4 - 15*K**3*_a0 + 50*K**2*_a0**2 - 60*K*_a0**3 + 24*_a0**4)/(24*K**4)', 'a5': '_a0*k**5*(K**5 - 31*K**4*_a0 + 180*K**3*_a0**2 - 390*K**2*_a0**3 + 360*K*_a0**4 - 120*_a0**5)/(120*K**5)', 'a6': '_a0*k**6*(K**6 - 63*K**5*_a0 + 602*K**4*_a0**2 - 2100*K**3*_a0**3 + 3360*K**2*_a0**4 - 2520*K*_a0**5 + 720*_a0**6)/(720*K**6)', 'a7': '_a0*k**7*(K**7 - 127*K**6*_a0 + 1932*K**5*_a0**2 - 10206*K**4*_a0**3 + 25200*K**3*_a0**4 - 31920*K**2*_a0**5 + 20160*K*_a0**6 - 5040*_a0**7)/(5040*K**7)', 'a8': '_a0*k**8*(K**8 - 255*K**7*_a0 + 6050*K**6*_a0**2 - 46620*K**5*_a0**3 + 166824*K**4*_a0**4 - 317520*K**3*_a0**5 + 332640*K**2*_a0**6 - 181440*K*_a0**7 + 40320*_a0**8)/(40320*K**8)'}",
+      "meaning": "coefficients of any analytic solution (partial determination up to series order 8)"
+    }
+  ],
+  "derived_conditions": [],
+  "candidates": [
+    {
+      "expr": "D0*K*exp(k*t)/(D0*exp(k*t) - D0 + K)",
+      "kind": "family",
+      "source": "T3:dsolve(declared:0)",
+      "sources": [
+        "T3:dsolve(declared:0)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [
+        "denominator nonzero: D0*exp(k*t) - D0 + K != 0"
+      ],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "log(D0/(D0 - K))/K"
+      },
+      "free_params": [
+        "D0"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = D0"
+    },
+    {
+      "expr": "K",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = D0"
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = D0"
+    },
+    {
+      "expr": "K",
+      "reason": "violates boundary condition f^(0)(0) = D0"
+    }
+  ],
+  "consistency_checks": [],
+  "derivation_chain": [
+    "T3: dsolve on Eq(Derivative(D(t), t), k*(K - D(t))*D(t)/K) -> K*exp(K*_C1 + k*t)/(exp(K*_C1 + k*t) - 1)"
+  ],
+  "tactic_notes": [
+    "T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Verify each constraint residual simplifies to 0 under the recorded domain/branch conditions (algebraic certificate).",
+    "Re-derive the reduction chain in a formal kernel (differentiation + evaluation at the identity/fixed point).",
+    "Check branch-enumeration completeness: every branch verified or eliminated with its recorded reason.",
+    "Check the parameter-pinning solve of the boundary system."
+  ]
+}
