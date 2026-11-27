@@ -198,6 +198,10 @@ class SafetensorsStreamReader:
         for name in candidates:
             if self.tensor_info(name) is not None:
                 return name
+        for name in candidates:
+            alt = name.replace("transformer.", "")
+            if alt != name and self.tensor_info(alt) is not None:
+                return alt
         return None
 
     def read_1d(self, name):
@@ -854,6 +858,10 @@ class GGUFStreamReader:
         for name in candidates:
             if name in self.tensors:
                 return name
+        for name in candidates:
+            alt = name.replace("transformer.", "")
+            if alt != name and alt in self.tensors:
+                return alt
         return None
 
     def arch_config(self):
