@@ -32,6 +32,15 @@ a fixed repertoire of GENERIC tactics and applies them autonomously:
   T4   power-series coefficient matching with joint (t, y) extraction
        and closed-form pattern synthesis                             (fix D)
   T5   algebraic elimination, disjunctive branching, constant ansatz
+  T6   special-point algebraic probes: diagonal x = y recursion and the
+       x = 0 anchor, with automatic solving of distinguished-point values
+  T7   polynomial ansatz with undetermined coefficients solved against the
+       full constraint coefficient system
+  T8   spectral ansatz for LINEAR LOCAL constraint sets: characteristic
+       equation P(lam) = 0, real roots -> exp(lam x), complex pairs ->
+       exp(a x) cos(bx) / exp(a x) sin(bx)
+  T9   superposition closure: linear combinations of already-verified
+       candidates, registered only after re-verification (linear systems)
 All BooleanTrue/BooleanFalse hazards are classified defensively      (fix A),
 all Subs point-evaluations are canonically rebuilt into named semantic
 constants (_d1, _v0, ...) -- never anonymous _k0                     (fix C).
@@ -39,11 +48,25 @@ constants (_d1, _v0, ...) -- never anonymous _k0                     (fix C).
 Honesty about open problems: for Riemann / Collatz / Navier-Stokes the engine
 attempts every applicable tactic, reports exactly what it can discover, and
 REFUSES to certify, listing the missing mathematical machinery.
+
+FULL-PROOF-ONLY OPEN-CONJECTURE MODE
+------------------------------------
+`python autonomous_proof_engine_v2.py --open-conjectures` runs ONLY the open
+mathematical conjectures (Riemann, Collatz, 3D Navier-Stokes).  Each
+conjecture is stated as MULTIPLE formulas that together would constitute the
+proof, and the run certifies the conjecture ONLY when EVERY formula reaches a
+gap-free PROVEN_EXACT proof.  Anything less -- a classification, a surrogate
+invariant, a partial lemma chain -- is recorded as a diagnostic and NEVER
+credited as progress toward settlement: the verdict is NO_FULL_PROOF, the
+missing machinery is listed per formula, and the run exits non-zero.  The
+engine does not settle for progress; it either proves the whole conjecture or
+refuses.
 """
 
 import json
 import os
 import re
+import sys
 import time
 import traceback
 from functools import lru_cache
@@ -168,8 +191,10 @@ class AutonomousProofEngine:
     def __init__(self, problem_name="Unnamed Problem", func_name='f',
                  var_name='x', aux_var_name='y', params=(),
                  param_assumptions=None, domain='real',
-                 auto_declare_regularity=True, k_max=3, series_order=8):
+                 auto_declare_regularity=True, k_max=3, series_order=8,
+                 full_proof_only=False):
         self.problem_name = problem_name
+        self.full_proof_only = bool(full_proof_only)
         self.x = sp.Symbol(var_name, real=True)
         self.y = sp.Symbol(aux_var_name, real=True)
         self.f = sp.Function(func_name)
@@ -608,6 +633,251 @@ class AutonomousProofEngine:
                                          branch_conds=[])
         else:
             self._register_candidate(c, source="T5:constant-ansatz", branch_conds=[])
+
+    # ------------------------------------------------------------------
+    # T6: special-point algebraic probes (diagonal, anchor)
+    # ------------------------------------------------------------------
+    def _tactic_special_points(self):
+        probes = [sp.expand(l - r) for (l, r) in self.diffs]
+        probes += [sp.expand(l - r) for (l, r) in self.algs]
+        probes += [sp.expand(l - r) for (l, r, _iv) in self.functionals]
+        probes += [sp.expand(l - r) for (l, r) in self.self_relations]
+        if not probes:
+            return
+        for base in probes:
+            if base.has(self.y):
+                try:
+                    diag = self._canon_subs(base.subs(self.y, self.x))
+                    diag, _ = self._point_constants(diag)
+                    diag = sp.simplify(sp.expand(diag))
+                except Exception:
+                    diag = None
+                if diag not in (None, 0) and diag not in self.derived_conditions:
+                    self.derived_conditions.append(sp.expand(diag))
+                    self.discovered_formulas.append({
+                        "formula": f"{diag} = 0",
+                        "meaning": "T6 special-point probe: the diagonal x = y turns "
+                                   "the constraint into a pointwise recursion"})
+                    self.derivation_chain.append(
+                        f"T6: diagonal substitution y = x -> necessary condition: {diag}")
+            try:
+                anch = self._canon_subs(base.subs(self.x, 0))
+                anch, _ = self._point_constants(anch)
+                anch = sp.simplify(sp.expand(anch))
+            except Exception:
+                anch = None
+            if anch not in (None, 0) and anch not in self.derived_conditions:
+                self.derived_conditions.append(sp.expand(anch))
+                if not anch.atoms(AppliedUndef) and not anch.atoms(Derivative):
+                    self.derivation_chain.append(
+                        f"T6: anchor x = 0 -> closed necessary condition: {anch}")
+                    try:
+                        consts = sorted(anch.free_symbols - {self.x, self.y}, key=str)
+                        if consts:
+                            sols = sp.solve(anch, consts, dict=True)
+                            for sol in list(sols)[:6]:
+                                pretty = ", ".join(f"{k} = {v}" for k, v in sol.items())
+                                self.discovered_formulas.append({
+                                    "formula": pretty,
+                                    "meaning": "T6 anchor probe pins a distinguished-point "
+                                               "value of the unknown function"})
+                                self.derivation_chain.append(
+                                    f"T6: anchor condition solved -> {pretty}")
+                    except Exception:
+                        pass
+                else:
+                    self.derivation_chain.append(
+                        f"T6: anchor x = 0 -> necessary condition: {anch}")
+
+    # ------------------------------------------------------------------
+    # shared local+linear precheck for the spectral / superposition tactics
+    # ------------------------------------------------------------------
+    def _local_linear_gens(self):
+        """Return (gen_list, exprs) when every constraint is LOCAL (f only ever
+        at argument x) and LINEAR in f and its x-derivatives; else ([], [])."""
+        exprs = [l - r for (l, r) in self.diffs] + [l - r for (l, r) in self.algs] \
+            + [l - r for (l, r, _iv) in self.functionals] \
+            + [l - r for (l, r) in self.self_relations]
+        if not exprs:
+            return [], []
+        gens = set()
+        for e in exprs:
+            for fn in e.atoms(AppliedUndef):
+                if fn.func == self.f:
+                    if fn.args[0] != self.x:
+                        return [], []
+                    gens.add(fn)
+            for d in e.atoms(Derivative):
+                if isinstance(d.expr, AppliedUndef) and d.expr.func == self.f:
+                    if d.expr.args[0] != self.x:
+                        return [], []
+                    gens.add(d)
+        if not gens:
+            return [], []
+        gen_list = sorted(gens, key=str)
+        subs_map = {g: sp.Symbol(f'_L{i}', real=True)
+                    for i, g in enumerate(gen_list)}
+        sym_list = [subs_map[g] for g in gen_list]
+        for e in exprs:
+            e_lin = sp.expand(e.xreplace(subs_map))
+            if any(e_lin.has(s) for s in sym_list):
+                poly = sp.Poly(e_lin, *sym_list)
+                if poly.total_degree() > 1:
+                    return [], []
+        return gen_list, exprs
+
+    def _local_linear_residuals(self):
+        return self._local_linear_gens()[1]
+
+    # ------------------------------------------------------------------
+    # T7: polynomial ansatz with undetermined coefficients
+    # ------------------------------------------------------------------
+    def _tactic_polynomial_ansatz(self, max_degree=3, max_solutions=8):
+        exprs = [l - r for (l, r) in self.diffs] + [l - r for (l, r) in self.algs] \
+            + [l - r for (l, r, _iv) in self.functionals] \
+            + [l - r for (l, r) in self.self_relations]
+        if not exprs:
+            return
+        for deg in range(1, max_degree + 1):
+            coeff_syms = [sp.Symbol(f'_p{i}', real=True) for i in range(deg + 1)]
+            poly = sum(c * self.x ** i for i, c in enumerate(coeff_syms))
+            eqs = []
+            for e in exprs:
+                try:
+                    resid = sp.expand(self._sub_candidate(e, poly))
+                except Exception:
+                    eqs = None
+                    break
+                variables = [v for v in (self.x, self.y) if resid.has(v)]
+                if variables:
+                    eqs.extend(sp.simplify(c) for c in sp.Poly(resid, *variables).coeffs())
+                else:
+                    eqs.append(sp.simplify(resid))
+            if not eqs:
+                continue
+            eqs = [q for q in eqs if q != 0]
+            if not eqs:
+                continue
+            try:
+                sols = sp.solve(eqs, coeff_syms, dict=True)
+            except Exception:
+                continue
+            sols = [s for s in sols if isinstance(s, dict)]
+            for sol in sols[:max_solutions]:
+                cand = sp.simplify(poly.subs(sol))
+                self._register_candidate(cand, source="T7:polynomial-ansatz",
+                                         branch_conds=[])
+                self.derivation_chain.append(
+                    f"T7: polynomial ansatz of degree {deg} solved the constraint "
+                    f"coefficient system -> candidate {cand}")
+
+    # ------------------------------------------------------------------
+    # T8: spectral ansatz for linear local constraints (characteristic eq.)
+    # ------------------------------------------------------------------
+    def _tactic_spectral_ansatz(self, max_roots=6):
+        gens, residuals = self._local_linear_gens()
+        if not gens or not residuals:
+            return
+        lam = sp.Symbol('_lam', real=False)
+        spectral_map = {}
+        for g in gens:
+            if isinstance(g, Derivative):
+                n = self._plain_order(g)
+                if n is None:
+                    return
+                spectral_map[g] = lam ** n
+            else:
+                spectral_map[g] = sp.S.One
+        for resid in residuals:
+            char_eq = sp.simplify(sp.expand(resid.xreplace(spectral_map)))
+            if char_eq.has(self.x, self.y) or char_eq == 0:
+                continue
+            if char_eq.has(sp.Symbol, AppliedUndef, Derivative) \
+                    and not char_eq.free_symbols <= {lam}:
+                continue
+            try:
+                roots = sp.solve(sp.Eq(char_eq, 0), lam)
+            except Exception:
+                continue
+            roots = [sp.sympify(rt) for rt in roots if sp.sympify(rt).is_number]
+            seen = set()
+            registered = 0
+            for rt in roots[:max_roots * 2]:
+                key = sp.simplify(rt)
+                if key in seen:
+                    continue
+                seen.add(key)
+                if registered >= max_roots:
+                    break
+                try:
+                    a, b = sp.re(key), sp.im(key)
+                except Exception:
+                    continue
+                if b == 0:
+                    if a == 0:
+                        continue  # constant branch: covered by T5
+                    cand = sp.exp(a * self.x)
+                    desc = f"real characteristic root lam = {a}"
+                else:
+                    if a == 0:
+                        cand = sp.cos(b * self.x)
+                        desc = f"imaginary characteristic pair lam = +/- {b}I"
+                    else:
+                        cand = sp.exp(a * self.x) * sp.cos(b * self.x)
+                        desc = f"complex characteristic pair lam = {a} +/- {b}I"
+                self._register_candidate(cand, source="T8:spectral-ansatz",
+                                         branch_conds=[])
+                self.derivation_chain.append(
+                    f"T8: characteristic equation {char_eq} = 0 -> {desc} "
+                    f"-> candidate {cand}")
+                if b != 0:
+                    partner = sp.sin(b * self.x) if a == 0 \
+                        else sp.exp(a * self.x) * sp.sin(b * self.x)
+                    self._register_candidate(partner, source="T8:spectral-ansatz",
+                                             branch_conds=[])
+                    self.derivation_chain.append(
+                        f"T8: conjugate partner of lam = {key} -> candidate {partner}")
+                    registered += 1
+                registered += 1
+
+    # ------------------------------------------------------------------
+    # T9: superposition closure over verified candidates (linear systems)
+    # ------------------------------------------------------------------
+    def _tactic_superposition(self, max_pairs=12):
+        if not self._local_linear_residuals():
+            return
+        verified = [c for c in self.candidates
+                    if c["verified"] and c["kind"] == "family"
+                    and c.get("status") not in ("eliminated", "absorbed",
+                                                 "failed_verification")]
+        if len(verified) < 2:
+            return
+        pairs = 0
+        for i in range(len(verified)):
+            for j in range(i + 1, len(verified)):
+                if pairs >= max_pairs:
+                    return
+                c1, c2 = verified[i]["expr"], verified[j]["expr"]
+                if c1 == 0 or c2 == 0:
+                    continue
+                try:
+                    ratio = sp.simplify(c1 / c2)
+                    if not ratio.has(self.x):
+                        continue  # linearly dependent over constants
+                except Exception:
+                    pass
+                alpha = sp.Symbol('_s0', real=True)
+                combo = sp.simplify(c1 + alpha * c2)
+                pairs += 1
+                self._register_candidate(combo, source="T9:superposition",
+                                         branch_conds=[])
+                self.derivation_chain.append(
+                    f"T9: linear superposition of verified candidates {c1} and "
+                    f"{c2} -> candidate {combo} (linearity of the constraint set)")
+                new_c = self.candidates[-1]
+                self._pin_candidate(new_c)
+                if new_c.get("status") not in ("eliminated",):
+                    self._verify_candidate(new_c)
 
     # ------------------------------------------------------------------
     # T3: ODE pipeline
@@ -1853,12 +2123,20 @@ class AutonomousProofEngine:
             self.status = "PROVEN_EXACT"
             self._certified_fn = pinned[0]["expr"]
             self._certified_family = [pinned[0]]
-        elif dedup and complete and not self.problem_gaps and family_cands:
+        elif dedup and complete and not self.problem_gaps and family_cands \
+                and not self.full_proof_only:
             self.status = "PROVEN_CLASSIFICATION"
             self._certified_family = [c for c in dedup
                                       if c.get("status") not in ("eliminated", "absorbed")]
         else:
             self.status = "INCOMPLETE_PROOF_GAPS_REMAIN"
+            if self.full_proof_only and family_cands and complete \
+                    and not self.problem_gaps:
+                self._add_gap("full_proof_only_refusal",
+                              "a complete verified family was reached, but a "
+                              "classification of a parametric family is NOT a full "
+                              "proof of the conjecture; full_proof_only mode refuses "
+                              "to settle for it")
             self._certified_family = [c for c in dedup
                                       if c.get("status") not in ("eliminated", "absorbed")] or None
 
@@ -1899,6 +2177,9 @@ class AutonomousProofEngine:
             self._tactic_series()
             self._tactic_algebraic()
             self._tactic_constants()
+            self._tactic_special_points()
+            self._tactic_polynomial_ansatz()
+            self._tactic_spectral_ansatz()
             # pin FIRST (BCs constrain the integration constants), then verify
             # the pinned form against ALL declared constraints
             for c in self.candidates:
@@ -1906,6 +2187,7 @@ class AutonomousProofEngine:
             for c in self.candidates:
                 if c["status"] in ("new", "free", "pinned", "partially_pinned"):
                     self._verify_candidate(c)
+            self._tactic_superposition()
             self._finalize()
         except Exception as exc:  # engine must never crash silently
             self.status = "INCOMPLETE_PROOF_GAPS_REMAIN"
@@ -1918,6 +2200,7 @@ class AutonomousProofEngine:
         return {
             "problem": self.problem_name,
             "status": self.status,
+            "full_proof_only": bool(self.full_proof_only),
             "certified_fn": self._certified_fn,
             "elapsed_s": self.elapsed,
             "axioms": list(self.declared_axioms),
@@ -1963,6 +2246,85 @@ class AutonomousProofEngine:
         else:
             obligations.append("Discharge every listed unsettled gap in a formal kernel "
                                "before any certification claim is admissible.")
+        cert["proof_obligations_for_formal_kernel"] = obligations
+        return json.loads(json.dumps(cert, default=str))
+
+
+# ===========================================================================
+# Multi-formula proofs: a conjecture stated as several formulas/lemmas that
+# together constitute the proof.  Certification requires the COMPLETE
+# conjunction: every formula fully proved, no partial settlement.
+# ===========================================================================
+
+class MultiFormulaProof:
+    """Conjecture = conjunction of formulas; certified only when EVERY formula
+    reaches a full, gap-free PROVEN_EXACT proof.  With full_proof_only=True,
+    classification-tier or partially verified formulas never count, and the
+    aggregate verdict is NO_FULL_PROOF until the whole conjunction is proved.
+    The per-formula verdicts identify exactly which formulas block the proof
+    and which mathematical machinery they still require."""
+
+    def __init__(self, conjecture_name, full_proof_only=True):
+        self.conjecture_name = str(conjecture_name)
+        self.full_proof_only = bool(full_proof_only)
+        self.formulas = []          # [{'tag', 'engine'}]
+        self.verdicts = []
+        self.status = "EMPTY_SYSTEM"
+        self.elapsed = 0.0
+
+    def add_formula(self, tag, engine):
+        engine.full_proof_only = self.full_proof_only
+        self.formulas.append({"tag": str(tag), "engine": engine})
+        return self
+
+    def prove_all(self):
+        t0 = time.time()
+        self.verdicts = []
+        for entry in self.formulas:
+            res = entry["engine"].solve_and_verify()
+            full = (res["status"] == "PROVEN_EXACT"
+                    and res["certified_fn"] is not None
+                    and not res["gaps"])
+            self.verdicts.append({
+                "formula": entry["tag"],
+                "status": res["status"],
+                "full_proof": bool(full),
+                "certified_fn": res["certified_fn"],
+                "gaps": res["gaps"],
+                "machinery": res["machinery"],
+                "discovered_diagnostics": res["discovered"],
+                "elapsed_s": res["elapsed_s"],
+            })
+        if not self.formulas:
+            self.status = "EMPTY_SYSTEM"
+        elif all(v["full_proof"] for v in self.verdicts):
+            self.status = "PROVEN_EXACT"
+        else:
+            self.status = "NO_FULL_PROOF"
+        self.elapsed = round(time.time() - t0, 2)
+        return self.result()
+
+    def result(self):
+        return {
+            "conjecture": self.conjecture_name,
+            "full_proof_only": self.full_proof_only,
+            "status": self.status,
+            "n_formulas": len(self.formulas),
+            "n_formulas_fully_proved": sum(1 for v in self.verdicts if v["full_proof"]),
+            "verdicts": list(self.verdicts),
+            "elapsed_s": self.elapsed,
+        }
+
+    def export_certificate(self):
+        cert = self.result()
+        obligations = []
+        if self.status == "PROVEN_EXACT":
+            obligations.append("Re-derive every formula's proof chain in a formal kernel.")
+        else:
+            blocking = [v["formula"] for v in self.verdicts if not v["full_proof"]]
+            obligations.append("Discharge the blocking formulas in a formal kernel "
+                               "before any certification claim is admissible: "
+                               + "; ".join(blocking))
         cert["proof_obligations_for_formal_kernel"] = obligations
         return json.loads(json.dumps(cert, default=str))
 
@@ -2016,10 +2378,11 @@ def bench_dalembert():
     return eng, eng.solve_and_verify()
 
 
-def bench_riemann():
+def _engine_riemann_selfduality(full_proof_only=False):
     eng = AutonomousProofEngine(
         "Riemann hypothesis | xi self-duality xi(s) = xi(1-s)",
-        func_name='xi', var_name='s', aux_var_name='w', auto_declare_regularity=True)
+        func_name='xi', var_name='s', aux_var_name='w',
+        auto_declare_regularity=True, full_proof_only=full_proof_only)
     xi, s = eng.f, eng.x
     eng.declare_hypothesis("xi(s) = (1/2) s (s-1) pi^(-s/2) Gamma(s/2) zeta(s)")
     eng.add_self_relation(xi(s), xi(1 - s))
@@ -2035,13 +2398,34 @@ def bench_riemann():
             "non-local symmetry analysis beyond affine fixed points",
         ],
     })
-    return eng, eng.solve_and_verify()
+    return eng
 
 
-def bench_collatz():
+def _engine_riemann_critical_line(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Riemann hypothesis | critical-line localisation of every nontrivial zero",
+        func_name='z', var_name='s', aux_var_name='w',
+        auto_declare_regularity=True, full_proof_only=full_proof_only)
+    eng.declare_hypothesis("zeta(s) meromorphic on C, single simple pole at s = 1")
+    eng.set_open_problem({
+        "objective": "every nontrivial zero s of zeta satisfies Re(s) = 1/2",
+        "arithmetic_atoms": ["completed xi function", "Euler product over the primes",
+                             "Gamma(s/2)"],
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "zero-counting on the critical strip (argument principle)",
+            "sign/positivity certificate excluding zeros off Re(s) = 1/2",
+            "spectral self-adjointness (Hilbert-Polya) or an equivalent positivity",
+        ],
+    })
+    return eng
+
+
+def _engine_collatz_surrogate(full_proof_only=False):
     eng = AutonomousProofEngine(
         "Collatz conjecture | parity-averaged smooth surrogate",
-        func_name='f', var_name='x', aux_var_name='w', auto_declare_regularity=True)
+        func_name='f', var_name='x', aux_var_name='w',
+        auto_declare_regularity=True, full_proof_only=full_proof_only)
     f, x = eng.f, eng.x
     eng.declare_hypothesis("surrogate: smooth shadow of T(n) = n/2 (even) | (3n+1)/2 (odd) "
                            "on the positive integers")
@@ -2059,6 +2443,96 @@ def bench_collatz():
             "divergent-orbit exclusion",
         ],
     })
+    return eng
+
+
+def _engine_collatz_cycles(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Collatz conjecture | non-trivial cycle and divergent-orbit exclusion",
+        func_name='g', var_name='n', aux_var_name='m',
+        auto_declare_regularity=True, full_proof_only=full_proof_only)
+    g, n = eng.f, eng.x
+    eng.declare_hypothesis("T: N+ -> N+ with T(n) = n/2 (even) | (3n+1)/2 (odd)")
+    eng.add_self_relation(g(2 * n), g(n))
+    eng.set_open_problem({
+        "objective": "no non-trivial periodic orbit and no divergent orbit under T",
+        "discrete_domain": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "2-adic / log-linear cycle bound: k log 3 < j log 2 with diophantine gap",
+            "Rhin-style strong-lower-bound zeta estimates on the cycle inequality",
+            "well-founded descent measure on N+ outside the trivial orbit",
+        ],
+    })
+    return eng
+
+
+def _engine_ns_energy(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "3D Navier-Stokes | Leray energy class and local well-posedness",
+        func_name='u', var_name='x', aux_var_name='w',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("u smooth, divergence-free, on R^3 x [0, T)")
+    eng.set_open_problem({
+        "objective": "a priori L_infty_t L_2_x control of smooth divergence-free data",
+        "pde_dimensional": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "Sobolev / Leray-Hopf energy estimates in 3D",
+            "incompressibility and pressure projection handling",
+        ],
+    })
+    return eng
+
+
+def _engine_ns_blowup(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "3D Navier-Stokes | vortex-stretching control and blow-up exclusion",
+        func_name='u', var_name='x', aux_var_name='w',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("u smooth, divergence-free, on R^3 x [0, T)")
+    eng.set_open_problem({
+        "objective": "no finite-time blow-up: ||u||_L_infty bounded on [0, T) for all T",
+        "pde_dimensional": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "vortex stretching control (omega . grad omega)",
+            "Beale-Kato-Majda blow-up criterion",
+            "global regularity a priori estimate closing the energy ladder in 3D",
+        ],
+    })
+    return eng
+
+
+def bench_cauchy_additive():
+    eng = AutonomousProofEngine(
+        "Cauchy additive equation f(x+y) = f(x) + f(y) | f(0)=0, f(1)=1",
+        func_name='f', var_name='x', aux_var_name='y', auto_declare_regularity=True)
+    f, x, y = eng.f, eng.x, eng.y
+    eng.declare_hypothesis("f: R -> R real-valued")
+    eng.add_functional_constraint(f(x + y), f(x) + f(y), identity_val=0)
+    eng.add_bc_value(0, point=0)
+    eng.add_bc_value(1, point=1)
+    return eng, eng.solve_and_verify()
+
+
+def bench_harmonic():
+    eng = AutonomousProofEngine(
+        "harmonic oscillator u'' + u = 0 | complete real solution family",
+        func_name='u', var_name='x', aux_var_name='w', auto_declare_regularity=True)
+    u, x = eng.f, eng.x
+    eng.declare_hypothesis("u twice differentiable on R")
+    eng.add_differential_constraint(sp.Derivative(u(x), (x, 2)), -u(x))
+    return eng, eng.solve_and_verify()
+
+
+def bench_riemann():
+    eng = _engine_riemann_selfduality()
+    return eng, eng.solve_and_verify()
+
+
+def bench_collatz():
+    eng = _engine_collatz_surrogate()
     return eng, eng.solve_and_verify()
 
 
@@ -2123,10 +2597,99 @@ def bench_ns3d():
     return eng, eng.solve_and_verify()
 
 
+# ---------------------------------------------------------------------------
+# FULL-PROOF-ONLY OPEN-CONJECTURE RUN
+#
+# Each open conjecture is stated as MULTIPLE formulas that together would
+# constitute the proof.  The conjecture is certified ONLY when every formula
+# is fully proved (gap-free PROVEN_EXACT); partial discoveries are recorded
+# as diagnostics and never settle the run.
+# ---------------------------------------------------------------------------
+
+def bench_riemann_fullproof():
+    mfp = MultiFormulaProof(
+        "Riemann hypothesis | full-proof-only, multi-formula",
+        full_proof_only=True)
+    mfp.add_formula(
+        "F1: xi self-duality xi(s) = xi(1-s) with complete branch enumeration",
+        _engine_riemann_selfduality(full_proof_only=True))
+    mfp.add_formula(
+        "F2: every nontrivial zero of zeta lies on Re(s) = 1/2",
+        _engine_riemann_critical_line())
+    return mfp
+
+
+def bench_collatz_fullproof():
+    mfp = MultiFormulaProof(
+        "Collatz conjecture | full-proof-only, multi-formula",
+        full_proof_only=True)
+    mfp.add_formula(
+        "F1: parity-averaged smooth surrogate admits only the constant invariant",
+        _engine_collatz_surrogate(full_proof_only=True))
+    mfp.add_formula(
+        "F2: no non-trivial cycle and no divergent orbit on N+ (Collatz)",
+        _engine_collatz_cycles())
+    return mfp
+
+
+def bench_ns3d_fullproof():
+    mfp = MultiFormulaProof(
+        "3D Navier-Stokes global regularity | full-proof-only, multi-formula",
+        full_proof_only=True)
+    mfp.add_formula(
+        "F1: Leray energy class controls smooth divergence-free data",
+        _engine_ns_energy())
+    mfp.add_formula(
+        "F2: vortex stretching is controlled; no finite-time blow-up",
+        _engine_ns_blowup())
+    return mfp
+
+
+def bench_burgers_multi_positive():
+    """Gate self-test (machinery check, NOT an open conjecture): a conjecture
+    whose two formulas are both fully provable must certify."""
+    mfp = MultiFormulaProof(
+        "steady 1D Burgers two-point library | both formulas provable",
+        full_proof_only=True)
+    mfp.add_formula("F1: IVP u(0)=1, u'(0)=0 pins u == 1",
+                    bench_burgers_ivp()[0])
+    mfp.add_formula("F2: singular-branch IVP u(0)=-2nu, u'(0)=2nu pins -2nu/(x+1)",
+                    bench_burgers_singular()[0])
+    return mfp
+
+
+def bench_burgers_multi_negative():
+    """Gate self-test (machinery check, NOT an open conjecture): one fully
+    provable formula plus one unproved (Collatz cycle-exclusion) formula must
+    refuse certification -- no partial settlement."""
+    mfp = MultiFormulaProof(
+        "mixed multi-formula conjecture | one formula unproved",
+        full_proof_only=True)
+    mfp.add_formula("F1: IVP u(0)=1, u'(0)=0 pins u == 1",
+                    bench_burgers_ivp()[0])
+    mfp.add_formula("F2: no non-trivial cycle and no divergent orbit on N+ (Collatz)",
+                    _engine_collatz_cycles())
+    return mfp
+
+
+OPEN_CONJECTURES = [
+    ("riemann_fullproof", bench_riemann_fullproof),
+    ("collatz_fullproof", bench_collatz_fullproof),
+    ("ns3d_fullproof", bench_ns3d_fullproof),
+]
+
+MULTI_FORMULA_GATE_CHECKS = [
+    ("burgers_multi_positive", bench_burgers_multi_positive),
+    ("burgers_multi_negative", bench_burgers_multi_negative),
+]
+
+
 BENCHMARKS = [
     ("cauchy_absolute", bench_cauchy_absolute),
     ("cauchy_classified", bench_cauchy_classified),
     ("cauchy_pinned", bench_cauchy_pinned),
+    ("cauchy_additive", bench_cauchy_additive),
+    ("harmonic", bench_harmonic),
     ("dalembert", bench_dalembert),
     ("riemann", bench_riemann),
     ("collatz", bench_collatz),
@@ -2269,6 +2832,35 @@ def run_assertions(R, ENGS):
           and any(c["kind"] == "constant" and c["verified"] for c in cl["candidates"]),
           str([str(c["expr"]) for c in cl["candidates"]])[:150])
 
+    # -- new tactics: T6 special points, T7 polynomial, T8 spectral, T9 superposition --
+    cad = R["cauchy_additive"]
+    eng_cad = ENGS["cauchy_additive"]
+    check("cauchy additive reaches PROVEN_EXACT with f(x) = x",
+          cad["status"] == "PROVEN_EXACT"
+          and eng_cad._certified_fn is not None
+          and sp.simplify(eng_cad._certified_fn - eng_cad.x) == 0,
+          f"{cad['status']} {eng_cad._certified_fn}")
+    check("cauchy additive polynomial ansatz (T7) contributed a candidate",
+          any("T7" in s for c in cad["candidates"] for s in c.get("sources", [])))
+    check("cauchy additive anchor probe (T6) pinned the distinguished points",
+          any("T6" in dc for dc in cad["derivation_chain"]))
+    hm = R["harmonic"]
+    eng_hm = ENGS["harmonic"]
+    check("harmonic reaches PROVEN_CLASSIFICATION",
+          hm["status"] == "PROVEN_CLASSIFICATION", hm["status"])
+    hm_verified = [str(c["expr"]) for c in eng_hm.candidates if c["verified"]]
+    check("harmonic spectral ansatz (T8) discovers sin and cos independently",
+          any("sin" in k for k in hm_verified) and any("cos" in k for k in hm_verified),
+          str(hm_verified)[:150])
+    check("harmonic superposition (T9) closes the solution space linearly",
+          any("T9" in s for c in hm["candidates"] for s in c.get("sources", [])))
+    dl2 = R["dalembert"]
+    diag_recorded = (any("f(2" in str(dc) for dc in dl2["derived_conditions"])
+                     or any("f(2" in d["formula"] for d in dl2["discovered"]))
+    check("dalembert special-point probe (T6) records the diagonal recursion",
+          diag_recorded,
+          str(dl2["derived_conditions"])[:150])
+
     # -- fix E source-level guarantee -----------------------------------------
     try:
         import ast as _ast
@@ -2362,7 +2954,137 @@ def write_report(R, checks, path):
     return npass, len(checks)
 
 
-def main():
+# ---------------------------------------------------------------------------
+# full-proof-only open-conjecture run
+# ---------------------------------------------------------------------------
+
+def run_open_assertions(R, MFPS):
+    checks = []
+
+    def check(name, cond, detail=""):
+        checks.append({"name": name, "pass": bool(cond), "detail": str(detail)[:200]})
+
+    for key, _fn in OPEN_CONJECTURES:
+        r = R[key]
+        check(f"{key}: run is full-proof-only",
+              r["full_proof_only"] is True, r["full_proof_only"])
+        check(f"{key}: conjecture NOT certified (strict non-settlement)",
+              r["status"] == "NO_FULL_PROOF", r["status"])
+        check(f"{key}: no formula certifies anything",
+              all(v["certified_fn"] is None for v in r["verdicts"]))
+        check(f"{key}: every unproved formula reports gaps or declared machinery",
+              all(v["gaps"] or v["machinery"] for v in r["verdicts"]
+                  if not v["full_proof"]))
+        check(f"{key}: multi-formula statement actually spans several formulas",
+              r["n_formulas"] >= 2, r["n_formulas"])
+
+    pos = R["burgers_multi_positive"]
+    check("gate positive: all-formulas-proved conjecture IS certified",
+          pos["status"] == "PROVEN_EXACT"
+          and pos["n_formulas_fully_proved"] == pos["n_formulas"] == 2,
+          f"{pos['status']} {pos['n_formulas_fully_proved']}/{pos['n_formulas']}")
+    neg = R["burgers_multi_negative"]
+    check("gate negative: one unproved formula blocks certification",
+          neg["status"] == "NO_FULL_PROOF"
+          and neg["n_formulas_fully_proved"] == 1 and neg["n_formulas"] == 2,
+          f"{neg['status']} {neg['n_formulas_fully_proved']}/{neg['n_formulas']}")
+    check("gate negative: the blocking formula is exactly identified",
+          any(not v["full_proof"] and "Collatz" in v["formula"]
+              for v in neg["verdicts"]))
+    return checks
+
+
+def write_open_report(R, checks, path):
+    L = []
+    L.append("=" * 78)
+    L.append("AUTONOMOUS PROOF ENGINE v2 -- FULL-PROOF-ONLY OPEN-CONJECTURE RUN")
+    L.append("Policy: only complete proofs of open mathematical conjectures count. "
+             "No partial progress is credited; classification-tier and surrogate "
+             "results are diagnostics only.")
+    L.append("=" * 78)
+    L.append("")
+    for key, _fn in OPEN_CONJECTURES:
+        r = R[key]
+        L.append("-" * 78)
+        L.append(f"[{key}] {r['conjecture']}")
+        L.append(f"  VERDICT: {r['status']}   "
+                 f"(formulas fully proved: {r['n_formulas_fully_proved']}/{r['n_formulas']}, "
+                 f"elapsed {r['elapsed_s']} s)")
+        for v in r["verdicts"]:
+            L.append(f"  formula: {v['formula']}")
+            L.append(f"    status={v['status']} full_proof={v['full_proof']} "
+                     f"certified_fn={v['certified_fn']}")
+            for d in v["discovered_diagnostics"]:
+                L.append(f"    diagnostic (NOT credited as proof): {d['formula'][:140]}")
+            for g in v["gaps"]:
+                L.append(f"    unsettled gap: {g['tag']}: {g['detail'][:150]}")
+            for m in v["machinery"]:
+                L.append(f"    missing machinery: {m}")
+        L.append("")
+    L.append("=" * 78)
+    L.append("MULTI-FORMULA GATE SELF-TESTS (machinery check, not conjectures)")
+    L.append("=" * 78)
+    for key, _fn in MULTI_FORMULA_GATE_CHECKS:
+        r = R[key]
+        L.append(f"  [{key}] {r['conjecture']}")
+        L.append(f"    verdict={r['status']} "
+                 f"proved={r['n_formulas_fully_proved']}/{r['n_formulas']}")
+    L.append("")
+    L.append("ASSERTION TEST SUITE")
+    L.append("=" * 78)
+    npass = sum(1 for c in checks if c["pass"])
+    for c in checks:
+        L.append(f"  [{'PASS' if c['pass'] else 'FAIL'}] {c['name']}"
+                 + (f"   [{c['detail']}]" if c["detail"] and not c["pass"] else ""))
+    L.append(f"\n  {npass}/{len(checks)} checks passed")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(L))
+    return npass, len(checks)
+
+
+def run_open_conjectures():
+    """Run ONLY the open mathematical conjectures, in full-proof-only mode.
+    Exit 0 only if EVERY conjecture is fully proved (all formulas gap-free
+    PROVEN_EXACT); otherwise exit 1 with NO_FULL_PROOF verdicts."""
+    out_dir = os.path.dirname(os.path.abspath(__file__))
+    cert_dir = os.path.join(out_dir, "certificates_open")
+    os.makedirs(cert_dir, exist_ok=True)
+    R, MFPS = {}, {}
+    for key, fn in OPEN_CONJECTURES + MULTI_FORMULA_GATE_CHECKS:
+        print(f"=== running {key} (full-proof-only) ...", flush=True)
+        mfp = fn()
+        res = mfp.prove_all()
+        R[key] = res
+        MFPS[key] = mfp
+        print(f"    verdict: {res['status']}  "
+              f"({res['n_formulas_fully_proved']}/{res['n_formulas']} formulas fully proved, "
+              f"{res['elapsed_s']} s)", flush=True)
+    checks = run_open_assertions(R, MFPS)
+    report_path = os.path.join(out_dir, "open_conjecture_run_report.txt")
+    npass, ntot = write_open_report(R, checks, report_path)
+    for key in R:
+        with open(os.path.join(cert_dir, f"{key}.json"), "w", encoding="utf-8") as fh:
+            json.dump(MFPS[key].export_certificate(), fh, indent=2, default=str)
+    print()
+    for c in checks:
+        print(f"  [{'PASS' if c['pass'] else 'FAIL'}] {c['name']}")
+    print(f"\n  {npass}/{ntot} checks passed")
+    print(f"  report written to: {report_path}")
+    print(f"  certificates written to: {cert_dir}/")
+    all_proved = all(R[key]["status"] == "PROVEN_EXACT"
+                     for key, _fn in OPEN_CONJECTURES)
+    if all_proved:
+        print("  ALL open conjectures FULLY PROVED (multi-formula, gap-free).")
+        return 0
+    print("  NO_FULL_PROOF: no open conjecture is fully proved. Partial progress "
+          "is NOT credited; the missing machinery is listed per formula.")
+    return 1
+
+
+def main(argv=None):
+    argv = list(sys.argv[1:]) if argv is None else list(argv)
+    if "--open-conjectures" in argv:
+        return run_open_conjectures()
     out_dir = os.path.dirname(os.path.abspath(__file__))
     cert_dir = os.path.join(out_dir, "certificates")
     os.makedirs(cert_dir, exist_ok=True)

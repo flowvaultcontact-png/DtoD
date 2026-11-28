@@ -1,3 +1,7 @@
 skills/
 node_modules/
 __pycache__/
+certificates/
+certificates_open/
+proof_run_report.txt
+open_conjecture_run_report.txt
