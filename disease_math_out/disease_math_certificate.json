@@ -1,0 +1,517 @@
+{
+  "engine": "AutonomousProofEngine v2 + disease_math representation layer",
+  "all_proved": true,
+  "n_theorems": 69,
+  "n_proved": 69,
+  "elapsed_s": 3.11,
+  "theorems": [
+    {
+      "tag": "M1[HYPERTENSION]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[HEART_FAILURE_HFPEF]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[PARKINSON_DISEASE]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[MAJOR_DEPRESSION]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[RHEUMATOID_ARTHRITIS]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[VENOUS_THROMBOEMBOLISM]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[CHRONIC_MYELOID_LEUKEMIA]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[HYPERCHOLESTEROLEMIA]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[BREAST_CANCER]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M1[ANGINA_PECTORIS]",
+      "claim": "untreated law engine-certified with exact residual 0",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION, family=D0*exp(g*t)"
+    },
+    {
+      "tag": "M2[diseases]",
+      "claim": "chi_D injective over the disease corpus",
+      "status": "PROVED",
+      "detail": "10 diseases"
+    },
+    {
+      "tag": "M2[drugs]",
+      "claim": "chi_m injective over the therapeutic drug corpus",
+      "status": "PROVED",
+      "detail": "10 drugs"
+    },
+    {
+      "tag": "M2[identity]",
+      "claim": "(chi_m, c(m)) injective over all drugs (decoys are dose-variants, distinct as (mechanism, exposure) pairs)",
+      "status": "PROVED",
+      "detail": "12 drugs"
+    },
+    {
+      "tag": "M3[HYPERTENSION|ramipril]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/10, g=1/10"
+    },
+    {
+      "tag": "M6a[HYPERTENSION|ramipril]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -4/5"
+    },
+    {
+      "tag": "M3[HEART_FAILURE_HFPEF|empagliflozin]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=7/10, g=2/25"
+    },
+    {
+      "tag": "M6a[HEART_FAILURE_HFPEF|empagliflozin]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -31/50"
+    },
+    {
+      "tag": "M3[PARKINSON_DISEASE|levodopa]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=18/25, g=1/20"
+    },
+    {
+      "tag": "M6a[PARKINSON_DISEASE|levodopa]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -67/100"
+    },
+    {
+      "tag": "M3[MAJOR_DEPRESSION|fluoxetine]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/20, g=1/25"
+    },
+    {
+      "tag": "M6a[MAJOR_DEPRESSION|fluoxetine]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -41/100"
+    },
+    {
+      "tag": "M3[RHEUMATOID_ARTHRITIS|infliximab]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=16/25, g=3/50"
+    },
+    {
+      "tag": "M6a[RHEUMATOID_ARTHRITIS|infliximab]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -29/50"
+    },
+    {
+      "tag": "M3[VENOUS_THROMBOEMBOLISM|apixaban]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/10, g=3/25"
+    },
+    {
+      "tag": "M6a[VENOUS_THROMBOEMBOLISM|apixaban]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -39/50"
+    },
+    {
+      "tag": "M3[CHRONIC_MYELOID_LEUKEMIA|imatinib]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=6/5, g=3/20"
+    },
+    {
+      "tag": "M6a[CHRONIC_MYELOID_LEUKEMIA|imatinib]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -21/20"
+    },
+    {
+      "tag": "M3[HYPERCHOLESTEROLEMIA|atorvastatin]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/10, g=1/20"
+    },
+    {
+      "tag": "M6a[HYPERCHOLESTEROLEMIA|atorvastatin]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -17/20"
+    },
+    {
+      "tag": "M3[BREAST_CANCER|paclitaxel]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1/2, k_eff=3/5, g=1/5"
+    },
+    {
+      "tag": "M6a[BREAST_CANCER|paclitaxel]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -2/5"
+    },
+    {
+      "tag": "M3[ANGINA_PECTORIS|bisoprolol]",
+      "claim": "cure law B(d, m) = 1 for the declared therapy",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/10, g=1/10"
+    },
+    {
+      "tag": "M6a[ANGINA_PECTORIS|bisoprolol]",
+      "claim": "treated load strictly decays (g - k_eff < 0)",
+      "status": "PROVED",
+      "detail": "g - k_eff = -4/5"
+    },
+    {
+      "tag": "M4[HYPERTENSION|fluoxetine_decoy_htn]",
+      "claim": "decoy refused by the cure law (coverage_zero)",
+      "status": "PROVED",
+      "detail": "coverage=0, k_eff=0, g=1/10, B=0"
+    },
+    {
+      "tag": "M4[HYPERTENSION|ramipril_microdose]",
+      "claim": "decoy refused by the cure law (dose_insufficient)",
+      "status": "PROVED",
+      "detail": "coverage=1, k_eff=9/200, g=1/10, B=0"
+    },
+    {
+      "tag": "M4[MAJOR_DEPRESSION|levodopa]",
+      "claim": "decoy refused by the cure law (coverage_zero)",
+      "status": "PROVED",
+      "detail": "coverage=0, k_eff=0, g=1/25, B=0"
+    },
+    {
+      "tag": "M4[BREAST_CANCER|fluoxetine_decoy_htn]",
+      "claim": "decoy refused by the cure law (coverage_zero)",
+      "status": "PROVED",
+      "detail": "coverage=0, k_eff=0, g=1/5, B=0"
+    },
+    {
+      "tag": "M4[ANGINA_PECTORIS|ramipril_microdose]",
+      "claim": "decoy refused by the cure law (coverage_zero)",
+      "status": "PROVED",
+      "detail": "coverage=0, k_eff=0, g=1/10, B=0"
+    },
+    {
+      "tag": "M5[HYPERTENSION|ramipril]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/10 - 9/10)*t)"
+    },
+    {
+      "tag": "M5[HEART_FAILURE_HFPEF|empagliflozin]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((2/25 - 7/10)*t)"
+    },
+    {
+      "tag": "M5[PARKINSON_DISEASE|levodopa]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/20 - 18/25)*t)"
+    },
+    {
+      "tag": "M5[MAJOR_DEPRESSION|fluoxetine]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/25 - 9/20)*t)"
+    },
+    {
+      "tag": "M5[RHEUMATOID_ARTHRITIS|infliximab]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/50 - 16/25)*t)"
+    },
+    {
+      "tag": "M5[VENOUS_THROMBOEMBOLISM|apixaban]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/25 - 9/10)*t)"
+    },
+    {
+      "tag": "M5[CHRONIC_MYELOID_LEUKEMIA|imatinib]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/20 - 6/5)*t)"
+    },
+    {
+      "tag": "M5[HYPERCHOLESTEROLEMIA|atorvastatin]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/20 - 9/10)*t)"
+    },
+    {
+      "tag": "M5[BREAST_CANCER|paclitaxel]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/5 - 3/5)*t)"
+    },
+    {
+      "tag": "M5[ANGINA_PECTORIS|bisoprolol]",
+      "claim": "certified treated family solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/10 - 9/10)*t)"
+    },
+    {
+      "tag": "M8[HYPERTENSION]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[HYPERTENSION]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[HEART_FAILURE_HFPEF]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[HEART_FAILURE_HFPEF]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[PARKINSON_DISEASE]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[PARKINSON_DISEASE]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[MAJOR_DEPRESSION]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[MAJOR_DEPRESSION]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[RHEUMATOID_ARTHRITIS]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[RHEUMATOID_ARTHRITIS]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[VENOUS_THROMBOEMBOLISM]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[VENOUS_THROMBOEMBOLISM]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[CHRONIC_MYELOID_LEUKEMIA]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[CHRONIC_MYELOID_LEUKEMIA]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[HYPERCHOLESTEROLEMIA]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[HYPERCHOLESTEROLEMIA]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[BREAST_CANCER]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[BREAST_CANCER]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M8[ANGINA_PECTORIS]",
+      "claim": "single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact",
+      "status": "PROVED",
+      "detail": "D1:ok; D2:ok; D3:ok; D4:ok; D5:ok; D6[s=0]:ok"
+    },
+    {
+      "tag": "M7[ANGINA_PECTORIS]",
+      "claim": "UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)",
+      "status": "PROVED",
+      "detail": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    {
+      "tag": "M9[all-pairs]",
+      "claim": "retrieval always true: B(d,m) == derived predicate over all 120 corpus pairs; therapy(d) in Drug(d) for every disease; every decoy refused",
+      "status": "PROVED",
+      "detail": "all pairs consistent"
+    }
+  ],
+  "disease_certificates": {
+    "HYPERTENSION": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "ramipril"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "HEART_FAILURE_HFPEF": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "empagliflozin"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "PARKINSON_DISEASE": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "levodopa"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "MAJOR_DEPRESSION": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "fluoxetine",
+        "fluoxetine_decoy_htn"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "RHEUMATOID_ARTHRITIS": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "infliximab"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "VENOUS_THROMBOEMBOLISM": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "apixaban"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "CHRONIC_MYELOID_LEUKEMIA": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "imatinib"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "HYPERCHOLESTEROLEMIA": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "atorvastatin"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "BREAST_CANCER": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "imatinib",
+        "paclitaxel"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    },
+    "ANGINA_PECTORIS": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true,
+      "derived_Drug(d)": [
+        "bisoprolol"
+      ],
+      "drug_requirement": "s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))"
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "problem": "Cauchy exponential equation | engine self-declares the needed C^1 axiom",
+  "status": "PROVEN_CLASSIFICATION",
+  "certified_fn": null,
+  "elapsed_s": 1.29,
+  "axioms": [
+    {
+      "tag": "C1_continuity_of_f_at_y=0",
+      "self_declared": true,
+      "reason": "differentiating the functional equation 1 time(s) in y and evaluating at y=0 presupposes C^1 regularity; without it Hamel-type wild solutions survive"
+    }
+  ],
+  "gaps": [],
+  "machinery": [
+    "general ODE solution theory (dsolve)"
+  ],
+  "discovered": [
+    {
+      "formula": "f(x) = exp(_a1*(x-0))",
+      "meaning": "closed form synthesised from the Taylor-coefficient pattern a_k = a1^k / k! (verified independently afterwards)"
+    }
+  ],
+  "derived_conditions": [
+    "_v0 - 1"
+  ],
+  "candidates": [
+    {
+      "expr": "exp(_d1*x)",
+      "kind": "family",
+      "source": "T3:dsolve(derived:0)",
+      "sources": [
+        "T3:dsolve(derived:0)",
+        "T4:series-synthesis(exp)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "1"
+      },
+      "free_params": [
+        "_d1"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T4:series-constant",
+      "sources": [
+        "T4:series-constant"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "exp(_d1*x)",
+      "kind": "family",
+      "source": "T4:series-synthesis(exp)",
+      "sources": [
+        "T4:series-synthesis(exp)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_d1"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "1",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "absorbed",
+      "pin": {},
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    }
+  ],
+  "consistency_checks": [
+    {
+      "condition": "constant candidate 1 is the {_d1: 0} slice of family exp(_d1*x)",
+      "family": "exp(_d1*x)",
+      "result": "absorbed"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "exp(_d1*x)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "1",
+      "result": "satisfied"
+    }
+  ],
+  "derivation_chain": [
+    "AXIOM self-declared: C1_continuity_of_f_at_y=0 -- differentiating the functional equation 1 time(s) in y and evaluating at y=0 presupposes C^1 regularity; without it Hamel-type wild solutions survive",
+    "T2: functional equation differentiated k=1 in y, evaluated at y=0 under axiom C1_continuity_of_f_at_y=0 -> ODE residual: -_d1*f(x) + Derivative(f(x), x)",
+    "T3: dsolve on Eq(Derivative(f(x), x), _d1*f(x)) -> _C1*exp(_d1*x)",
+    "T5: disjunctive factor _v0 - 1 = 0 is a derived necessary condition"
+  ],
+  "tactic_notes": [
+    "T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Verify each constraint residual simplifies to 0 under the recorded domain/branch conditions (algebraic certificate).",
+    "Re-derive the reduction chain in a formal kernel (differentiation + evaluation at the identity/fixed point).",
+    "Check branch-enumeration completeness: every branch verified or eliminated with its recorded reason.",
+    "Check the parameter-pinning solve of the boundary system."
+  ]
+}

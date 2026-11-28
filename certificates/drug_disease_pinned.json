@@ -1,0 +1,77 @@
+{
+  "problem": "Drug-disease interaction | unit initial load D(0) = 1 (clearance law)",
+  "status": "PROVEN_EXACT",
+  "certified_fn": "exp(-t*(c*k - g))",
+  "elapsed_s": 1.4,
+  "axioms": [],
+  "gaps": [],
+  "machinery": [
+    "general ODE solution theory (dsolve)"
+  ],
+  "discovered": [
+    {
+      "formula": "Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*(-c*k + g)', 'a2': '_a0*(c**2*k**2 - 2*c*g*k + g**2)/2', 'a3': '_a0*(-c**3*k**3 + 3*c**2*g*k**2 - 3*c*g**2*k + g**3)/6', 'a4': '_a0*(c**4*k**4 - 4*c**3*g*k**3 + 6*c**2*g**2*k**2 - 4*c*g**3*k + g**4)/24', 'a5': '_a0*(-c**5*k**5 + 5*c**4*g*k**4 - 10*c**3*g**2*k**3 + 10*c**2*g**3*k**2 - 5*c*g**4*k + g**5)/120', 'a6': '_a0*(c**6*k**6 - 6*c**5*g*k**5 + 15*c**4*g**2*k**4 - 20*c**3*g**3*k**3 + 15*c**2*g**4*k**2 - 6*c*g**5*k + g**6)/720', 'a7': '_a0*(-c**7*k**7 + 7*c**6*g*k**6 - 21*c**5*g**2*k**5 + 35*c**4*g**3*k**4 - 35*c**3*g**4*k**3 + 21*c**2*g**5*k**2 - 7*c*g**6*k + g**7)/5040', 'a8': '_a0*(c**8*k**8 - 8*c**7*g*k**7 + 28*c**6*g**2*k**6 - 56*c**5*g**3*k**5 + 70*c**4*g**4*k**4 - 56*c**3*g**5*k**3 + 28*c**2*g**6*k**2 - 8*c*g**7*k + g**8)/40320'}",
+      "meaning": "coefficients of any analytic solution (partial determination up to series order 8)"
+    }
+  ],
+  "derived_conditions": [],
+  "candidates": [
+    {
+      "expr": "exp(-t*(c*k - g))",
+      "kind": "family",
+      "source": "T3:dsolve(declared:0)",
+      "sources": [
+        "T3:dsolve(declared:0)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [
+        "denominator nonzero: exp(c*k*t) != 0"
+      ],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "1"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    }
+  ],
+  "consistency_checks": [],
+  "derivation_chain": [
+    "T3: dsolve on Eq(Derivative(D(t), t), (-c*k + g)*D(t)) -> _C1*exp(t*(-c*k + g))"
+  ],
+  "tactic_notes": [
+    "T4: 4 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Verify each constraint residual simplifies to 0 under the recorded domain/branch conditions (algebraic certificate).",
+    "Re-derive the reduction chain in a formal kernel (differentiation + evaluation at the identity/fixed point).",
+    "Check branch-enumeration completeness: every branch verified or eliminated with its recorded reason.",
+    "Check the parameter-pinning solve of the boundary system."
+  ]
+}

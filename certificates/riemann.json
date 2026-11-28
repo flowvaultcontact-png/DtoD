@@ -1,0 +1,87 @@
+{
+  "problem": "Riemann hypothesis | xi self-duality xi(s) = xi(1-s)",
+  "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
+  "certified_fn": null,
+  "elapsed_s": 0.18,
+  "axioms": [
+    {
+      "tag": "C1_continuity_of_f",
+      "self_declared": true,
+      "reason": "differentiating the self-relation presupposes C^1 regularity"
+    }
+  ],
+  "gaps": [
+    {
+      "tag": "arithmetic_atom",
+      "detail": "declared arithmetic atom 'zeta(s)' requires analytic-number-theory machinery outside symbolic tactics"
+    },
+    {
+      "tag": "arithmetic_atom",
+      "detail": "declared arithmetic atom 'Euler product over the primes' requires analytic-number-theory machinery outside symbolic tactics"
+    },
+    {
+      "tag": "arithmetic_atom",
+      "detail": "declared arithmetic atom 'Gamma(s/2)' requires analytic-number-theory machinery outside symbolic tactics"
+    }
+  ],
+  "machinery": [],
+  "discovered": [
+    {
+      "formula": "2*_d1_at_1/2 = 0",
+      "meaning": "consequence of the self-relation at its fixed point x* = 1/2 (order 1)"
+    },
+    {
+      "formula": "Taylor recurrence around x=1/2: {'a0': '_a0', 'a2': '_a2', 'a4': '_a4', 'a6': '_a6', 'a8': '_a8'}",
+      "meaning": "coefficients of any analytic solution (partial determination up to series order 8)"
+    }
+  ],
+  "derived_conditions": [
+    "2*_d1_at_1/2",
+    "_d1_at_1/2"
+  ],
+  "candidates": [
+    {
+      "expr": "_c",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_c"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [],
+  "consistency_checks": [
+    {
+      "condition": "2*_d1_at_1/2",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1_at_1/2",
+      "family": "_c",
+      "result": "satisfied"
+    }
+  ],
+  "derivation_chain": [
+    "AXIOM self-declared: C1_continuity_of_f -- differentiating the self-relation presupposes C^1 regularity",
+    "T2b: self-relation differentiated k=1, evaluated at fixed point x*=1/2 -> condition: 2*_d1_at_1/2",
+    "T5: disjunctive factor _d1_at_1/2 = 0 is a derived necessary condition"
+  ],
+  "tactic_notes": [
+    "T4: 2 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Discharge every listed unsettled gap in a formal kernel before any certification claim is admissible."
+  ]
+}

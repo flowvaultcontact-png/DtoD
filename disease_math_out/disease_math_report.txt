@@ -1,0 +1,158 @@
+==============================================================================
+DISEASE -> MATHEMATICS | full formal representations + formula layer
+==============================================================================
+feature space: GF(2)^23  (6 etiology / 10 pathway / 7 organ axes)
+corpus: 10 diseases, 12 drugs, 10 declared therapies, 5 decoys
+
+THE REPRESENTATION OF A DISEASE (example: HYPERTENSION)
+  disease            = HYPERTENSION
+  chi_D              = ['ETIOLOGY_FUNCTIONAL', 'PW_RAAS', 'ORGAN_VESSEL']
+  g(d)               = 1/10
+  untreated_law      = D'(t) = (1/10) * D(t),  D(0) = D0
+  certified_family   = D(t) = D0 * exp((1/10) * t)
+
+THE REPRESENTATION OF A DRUG (example: ramipril)
+  drug               = ramipril
+  chi_m              = ['PW_RAAS']
+  k(m)               = 9/10
+  c(m)               = 1
+
+FORMULAS CONSUMING THESE INPUTS
+  coverage(d,m)      : |chi_D^PW AND chi_m^PW| / |chi_D^PW|
+  k_eff(d,m)         : k(m) * c(m) * coverage(d,m)
+  cure_law           : B(d,m) = 1 <=> coverage(d,m) > 0 AND k_eff(d,m) > g(d)
+  treated_law        : D'(t) = (g(d) - k_eff(d,m)) * D(t)
+  treated_family     : rho(d,m,t) = D0 * exp((g(d) - k_eff(d,m)) * t)
+  derived_requirement : s(d,m) > 0 AND k(m)*c(m) > g(d)*n/s(d,m)  <=>  c(m) > c*(d,m) = g(d)*n/(s(d,m)*k(m))
+
+THE DERIVED REQUIREMENT ON THE DRUG (from the input R(d) alone; always true, complete branch enumeration)
+  HYPERTENSION (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against ramipril (k=9/10): c* = 1/9
+    derived Drug(d) = ['ramipril']
+  HEART_FAILURE_HFPEF (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against empagliflozin (k=7/10): c* = 4/35
+    derived Drug(d) = ['empagliflozin']
+  PARKINSON_DISEASE (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against levodopa (k=4/5): c* = 1/16
+    derived Drug(d) = ['levodopa']
+  MAJOR_DEPRESSION (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against fluoxetine (k=1/2): c* = 2/25
+    derived Drug(d) = ['fluoxetine', 'fluoxetine_decoy_htn']
+  RHEUMATOID_ARTHRITIS (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against infliximab (k=4/5): c* = 3/40
+    derived Drug(d) = ['infliximab']
+  VENOUS_THROMBOEMBOLISM (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against apixaban (k=1): c* = 3/25
+    derived Drug(d) = ['apixaban']
+  CHRONIC_MYELOID_LEUKEMIA (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against imatinib (k=6/5): c* = 1/8
+    derived Drug(d) = ['imatinib']
+  HYPERCHOLESTEROLEMIA (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against atorvastatin (k=9/10): c* = 1/18
+    derived Drug(d) = ['atorvastatin']
+  BREAST_CANCER (n=2 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against paclitaxel (k=3/2): c* = 4/15
+    derived Drug(d) = ['imatinib', 'paclitaxel']
+  ANGINA_PECTORIS (n=1 pathway axes):
+    requirement: s > 0 AND k(m)*c(m) > g(d)*n/s  (equivalently c(m) > c* = g(d)*n/(s*k(m)))
+    example c* against bisoprolol (k=9/10): c* = 1/9
+    derived Drug(d) = ['bisoprolol']
+
+WORKED EVALUATION (HYPERTENSION x ramipril)
+  coverage = 1, k_eff = 9/10, g = 1/10, B = 1
+  treated family: D(t) = D0 * exp((1/10 - 9/10) * t)  (strict decay)
+
+WORKED EVALUATION (HYPERTENSION x ramipril_microdose)
+  coverage = 1, k_eff = 9/200, g = 1/10, B = 0  -> cure refused (k_eff <= g)
+
+==============================================================================
+PROOF BATTERY
+==============================================================================
+  [PROVED    ] M1[HYPERTENSION]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[HEART_FAILURE_HFPEF]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[PARKINSON_DISEASE]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[MAJOR_DEPRESSION]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[RHEUMATOID_ARTHRITIS]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[VENOUS_THROMBOEMBOLISM]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[CHRONIC_MYELOID_LEUKEMIA]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[HYPERCHOLESTEROLEMIA]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[BREAST_CANCER]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M1[ANGINA_PECTORIS]: untreated law engine-certified with exact residual 0
+  [PROVED    ] M2[diseases]: chi_D injective over the disease corpus
+  [PROVED    ] M2[drugs]: chi_m injective over the therapeutic drug corpus
+  [PROVED    ] M2[identity]: (chi_m, c(m)) injective over all drugs (decoys are dose-variants, distinct as (mechanism, exposure) pairs)
+  [PROVED    ] M3[HYPERTENSION|ramipril]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[HYPERTENSION|ramipril]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[HEART_FAILURE_HFPEF|empagliflozin]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[HEART_FAILURE_HFPEF|empagliflozin]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[PARKINSON_DISEASE|levodopa]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[PARKINSON_DISEASE|levodopa]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[MAJOR_DEPRESSION|fluoxetine]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[MAJOR_DEPRESSION|fluoxetine]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[RHEUMATOID_ARTHRITIS|infliximab]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[RHEUMATOID_ARTHRITIS|infliximab]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[VENOUS_THROMBOEMBOLISM|apixaban]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[VENOUS_THROMBOEMBOLISM|apixaban]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[CHRONIC_MYELOID_LEUKEMIA|imatinib]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[CHRONIC_MYELOID_LEUKEMIA|imatinib]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[HYPERCHOLESTEROLEMIA|atorvastatin]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[HYPERCHOLESTEROLEMIA|atorvastatin]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[BREAST_CANCER|paclitaxel]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[BREAST_CANCER|paclitaxel]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M3[ANGINA_PECTORIS|bisoprolol]: cure law B(d, m) = 1 for the declared therapy
+  [PROVED    ] M6a[ANGINA_PECTORIS|bisoprolol]: treated load strictly decays (g - k_eff < 0)
+  [PROVED    ] M4[HYPERTENSION|fluoxetine_decoy_htn]: decoy refused by the cure law (coverage_zero)
+  [PROVED    ] M4[HYPERTENSION|ramipril_microdose]: decoy refused by the cure law (dose_insufficient)
+  [PROVED    ] M4[MAJOR_DEPRESSION|levodopa]: decoy refused by the cure law (coverage_zero)
+  [PROVED    ] M4[BREAST_CANCER|fluoxetine_decoy_htn]: decoy refused by the cure law (coverage_zero)
+  [PROVED    ] M4[ANGINA_PECTORIS|ramipril_microdose]: decoy refused by the cure law (coverage_zero)
+  [PROVED    ] M5[HYPERTENSION|ramipril]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[HEART_FAILURE_HFPEF|empagliflozin]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[PARKINSON_DISEASE|levodopa]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[MAJOR_DEPRESSION|fluoxetine]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[RHEUMATOID_ARTHRITIS|infliximab]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[VENOUS_THROMBOEMBOLISM|apixaban]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[CHRONIC_MYELOID_LEUKEMIA|imatinib]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[HYPERCHOLESTEROLEMIA|atorvastatin]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[BREAST_CANCER|paclitaxel]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M5[ANGINA_PECTORIS|bisoprolol]: certified treated family solves the treated ODE exactly
+  [PROVED    ] M8[HYPERTENSION]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[HYPERTENSION]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[HEART_FAILURE_HFPEF]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[HEART_FAILURE_HFPEF]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[PARKINSON_DISEASE]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[PARKINSON_DISEASE]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[MAJOR_DEPRESSION]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[MAJOR_DEPRESSION]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[RHEUMATOID_ARTHRITIS]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[RHEUMATOID_ARTHRITIS]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[VENOUS_THROMBOEMBOLISM]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[VENOUS_THROMBOEMBOLISM]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[CHRONIC_MYELOID_LEUKEMIA]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[CHRONIC_MYELOID_LEUKEMIA]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[HYPERCHOLESTEROLEMIA]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[HYPERCHOLESTEROLEMIA]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[BREAST_CANCER]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[BREAST_CANCER]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M8[ANGINA_PECTORIS]: single-crossing derivation from the input R(d): cure <=> c(m) > c* = g*n/(s*k), all steps exact
+  [PROVED    ] M7[ANGINA_PECTORIS]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
+  [PROVED    ] M9[all-pairs]: retrieval always true: B(d,m) == derived predicate over all 120 corpus pairs; therapy(d) in Drug(d) for every disease; every decoy refused
+
+  69/69 theorems PROVED  (elapsed 3.11 s)
+
+DERIVATION TRACE (HYPERTENSION -- what the input puts on any drug)
+    [D1] ok: k_eff(d, m) = k(m) * c(m) * s / n (definitional, from the input)
+    [D2] ok: k_eff strictly increasing in exposure: dk_eff/dc = k*s/n > 0
+    [D3] ok: unique crossing c* = g*n/(s*k), residual f(c*) = 0 exactly
+    [D4] ok: f(0) = -g < 0: below the crossing at zero exposure
+    [D5] ok: THEREFORE (always true): cure fires  <=>  c(m) > c*(d, m)  <=>  k(m)*c(m) > g(d)*n/s
+    [D6[s=0]] ok: branch s = 0 eliminated for EVERY drug: k_eff = 0 and 0 > g(d) is false (g > 0) -- no cure without pathway coverage

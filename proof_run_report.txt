@@ -1,0 +1,591 @@
+==============================================================================
+AUTONOMOUS PROOF ENGINE v2 -- RUN REPORT (strict non-settlement mode)
+==============================================================================
+Residual cache: CacheInfo(hits=109, misses=31, maxsize=8192, currsize=31) (configured max=8192)
+
+------------------------------------------------------------------------------
+[disease_growth] Disease dynamics | untreated progression D' = k D (initial load D0)
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 0.49 s)
+  certified function: None
+  candidates:
+    - D0*exp(k*t)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={'_C1': 'D0'} free=['D0']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = D0
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = D0
+  discovered structure:
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*k', 'a2': '_a0*k**2/2', 'a3': '_a0*k**3/6', 'a4': '_a0*k**4/24', 'a5': '_a0*k**5/120', 'a6': '_
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 4 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[disease_logistic] Disease dynamics | capacity-limited progression D' = k D (1 - D/K)
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 3.78 s)
+  certified function: None
+  candidates:
+    - D0*K*exp(k*t)/(D0*exp(k*t) - D0 + K)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={'_C1': 'log(D0/(D0 - K))/K'} free=['D0']
+      domain guards: ['denominator nonzero: D0*exp(k*t) - D0 + K != 0']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = D0
+    - K
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = D0
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = D0
+    - K  reason: violates boundary condition f^(0)(0) = D0
+  discovered structure:
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*k*(K - _a0)/K', 'a2': '_a0*k**2*(K**2 - 3*K*_a0 + 2*_a0**2)/(2*K**2)', 'a3': '_a0*k**3*(K**3 - 
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[drug_pk] Drug PK | constant infusion with first-order elimination C' = R - k C
+  STATUS: PROVEN_EXACT   (elapsed 0.7 s)
+  certified function: R/k - R*exp(-k*t)/k
+  candidates:
+    - R/k - R*exp(-k*t)/k
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '-R/k'} free=[]
+      domain guards: ['denominator nonzero: k*exp(k*t) != 0']
+    - R/k
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 0
+  eliminated branches:
+    - R/k  reason: violates boundary condition f^(0)(0) = 0
+  discovered structure:
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': 'R - _a0*k', 'a2': 'k*(-R + _a0*k)/2', 'a3': 'k**2*(R - _a0*k)/6', 'a4': 'k**3*(-R + _a0*k)/24', 'a5
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 4 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[drug_disease] Drug-disease interaction | constant exposure c: D' = (g - k c) D (initial load D0)
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 1.6 s)
+  certified function: None
+  candidates:
+    - D0*exp(-t*(c*k - g))
+      kind=family status=verified verified=True pin_status=partially_pinned pin={'_C1': 'D0'} free=['D0']
+      domain guards: ['denominator nonzero: exp(c*k*t) != 0']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = D0
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = D0
+  discovered structure:
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*(-c*k + g)', 'a2': '_a0*(c**2*k**2 - 2*c*g*k + g**2)/2', 'a3': '_a0*(-c**3*k**3 + 3*c**2*g*k**2
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 4 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[drug_disease_pinned] Drug-disease interaction | unit initial load D(0) = 1 (clearance law)
+  STATUS: PROVEN_EXACT   (elapsed 1.4 s)
+  certified function: exp(-t*(c*k - g))
+  candidates:
+    - exp(-t*(c*k - g))
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '1'} free=[]
+      domain guards: ['denominator nonzero: exp(c*k*t) != 0']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+  discovered structure:
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a0*(-c*k + g)', 'a2': '_a0*(c**2*k**2 - 2*c*g*k + g**2)/2', 'a3': '_a0*(-c**3*k**3 + 3*c**2*g*k**2
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 4 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[cauchy_absolute] Cauchy exponential equation | absolute mode (no regularity declared)
+  STATUS: INCOMPLETE_PROOF_GAPS_REMAIN   (elapsed 1.32 s)
+  certified function: None
+  candidates:
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - exp(_d1*x)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={} free=['_d1']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - 1
+      kind=constant status=absorbed verified=True pin_status=pinned pin={} free=[]
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+  discovered structure:
+    - f(x) = exp(_a1*(x-0))
+      (closed form synthesised from the Taylor-coefficient pattern a_k = a1^k / k! (verified independently afterwards))
+  derived necessary conditions: ['_v0 - 1']
+  consistency checks:
+    - constant candidate 1 is the {_d1: 0} slice of family exp(_d1*x) -> absorbed
+    - _v0 - 1 -> satisfied
+    - _v0 - 1 -> satisfied
+  unsettled gaps:
+    - C1_continuity_of_f_at_y=0_not_declared: engine needs C^1 regularity to reduce; absolute mode leaves the reduction unavailable
+  tactic notes:
+    - T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[cauchy_classified] Cauchy exponential equation | engine self-declares the needed C^1 axiom
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 1.29 s)
+  certified function: None
+  self-declared axioms:
+    - C1_continuity_of_f_at_y=0: differentiating the functional equation 1 time(s) in y and evaluating at y=0 presupposes C^1 regularity; without it Hamel-type wild solutions survive
+  candidates:
+    - exp(_d1*x)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={'_C1': '1'} free=['_d1']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - exp(_d1*x)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={} free=['_d1']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - 1
+      kind=constant status=absorbed verified=True pin_status=pinned pin={} free=[]
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+  discovered structure:
+    - f(x) = exp(_a1*(x-0))
+      (closed form synthesised from the Taylor-coefficient pattern a_k = a1^k / k! (verified independently afterwards))
+  derived necessary conditions: ['_v0 - 1']
+  consistency checks:
+    - constant candidate 1 is the {_d1: 0} slice of family exp(_d1*x) -> absorbed
+    - _v0 - 1 -> satisfied
+    - _v0 - 1 -> satisfied
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[cauchy_pinned] Cauchy exponential equation | IVP f(0)=1, f'(0)=2
+  STATUS: PROVEN_EXACT   (elapsed 1.25 s)
+  certified function: exp(2*x)
+  self-declared axioms:
+    - C1_continuity_of_f_at_y=0: differentiating the functional equation 1 time(s) in y and evaluating at y=0 presupposes C^1 regularity; without it Hamel-type wild solutions survive
+  candidates:
+    - exp(2*x)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '1', '_d1': '2'} free=[]
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - exp(2*x)
+      kind=family status=verified verified=True pin_status=pinned pin={'_d1': '2'} free=[]
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - 1
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(1)(0) = 2
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - 1  reason: violates boundary condition f^(1)(0) = 2
+  discovered structure:
+    - f(x) = exp(_a1*(x-0))
+      (closed form synthesised from the Taylor-coefficient pattern a_k = a1^k / k! (verified independently afterwards))
+  derived necessary conditions: ['_v0 - 1']
+  consistency checks:
+    - _v0 - 1 -> satisfied
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+  tactic notes:
+    - T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[dalembert] d'Alembert cosine equation f(x+y)+f(x-y) = 2 f(x) f(y)
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 11.61 s)
+  certified function: None
+  self-declared axioms:
+    - C2_continuity_of_f_at_y=0: differentiating the functional equation 2 time(s) in y and evaluating at y=0 presupposes C^2 regularity; without it Hamel-type wild solutions survive
+  candidates:
+    - cosh(sqrt(_d2)*x)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={'_C1': '1/2', '_C2': '1/2'} free=['_d2']
+    - cos(2**(2/3)*pi**(1/3)*x/2)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '2**(1/3)*pi**(2/3)/2', '_d2': '-2**(1/3)*pi**(2/3)/2'} free=[]
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))
+      kind=family status=failed_verification verified=False pin_status=partially_pinned pin={'_C1': '-I*pi/(2*sqrt(_d2))'} free=['_d2']
+      branch conds: ['u(x) < -sqrt(-_C1/_d2)', '-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))']
+      eliminated: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))
+      kind=family status=failed_verification verified=False pin_status=partially_pinned pin={'_C1': '-I*pi/(2*sqrt(_d2))'} free=['_d2']
+      branch conds: ['-sqrt(-_C1/_d2) < u(x) < sqrt(-_C1/_d2)', '-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))']
+      eliminated: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))
+      kind=family status=failed_verification verified=False pin_status=partially_pinned pin={'_C1': '-I*pi/(2*sqrt(_d2))'} free=['_d2']
+      branch conds: ['u(x) > sqrt(-_C1/_d2)', '-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))']
+      eliminated: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+    - cos(2**(2/3)*pi**(1/3)*x/2)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '2**(1/3)*pi**(2/3)/2', '_d2': '-2**(1/3)*pi**(2/3)/2'} free=[]
+    - cos(2**(2/3)*pi**(1/3)*x/2)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '2**(1/3)*pi**(2/3)/2', '_d2': '-2**(1/3)*pi**(2/3)/2'} free=[]
+      branch conds: ['u(x) < -sqrt(-_C1/_d2)']
+    - cos(2**(2/3)*pi**(1/3)*x/2)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '2**(1/3)*pi**(2/3)/2', '_d2': '-2**(1/3)*pi**(2/3)/2'} free=[]
+      branch conds: ['-sqrt(-_C1/_d2) < u(x) < sqrt(-_C1/_d2)']
+    - cos(2**(2/3)*pi**(1/3)*x/2)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '2**(1/3)*pi**(2/3)/2', '_d2': '-2**(1/3)*pi**(2/3)/2'} free=[]
+      branch conds: ['u(x) > sqrt(-_C1/_d2)']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - cosh(sqrt(_d2)*x)
+      kind=family status=verified verified=True pin_status=partially_pinned pin={} free=['_d2']
+    - 0
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: violates boundary condition f^(0)(0) = 1
+    - 1
+      kind=constant status=absorbed verified=True pin_status=pinned pin={} free=[]
+  eliminated branches:
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - 0  reason: violates boundary condition f^(0)(0) = 1
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))  reason: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))  reason: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+    - sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))  reason: residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)
+  discovered structure:
+    - sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const
+      (first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent))
+    - u(x) = c (constant), c in [-sqrt(-_C1/_d2), sqrt(-_C1/_d2)] (equilibria of u' = g(u)); every constant c is a solution of the raw equation with the inv
+      (equilibrium/constant branch of the autonomous flow)
+    - -sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const
+      (first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent))
+    - u(x) = c (constant), c in [-sqrt(-_C1/_d2), sqrt(-_C1/_d2)] (equilibria of u' = g(u)); every constant c is a solution of the raw equation with the inv
+      (equilibrium/constant branch of the autonomous flow)
+    - f(x) = cosh(sqrt(2*_a2)*(x-0))
+      (even closed form synthesised from the recurrence a_{2m} = (2a2)^m / (2m)! (verified independently afterwards))
+  derived necessary conditions: ['-2*_d1*f(x)', '_d1', '_v0 - 1']
+  consistency checks:
+    - constant candidate 1 is the {_d2: 0} slice of family cosh(sqrt(_d2)*x) -> absorbed
+    - -2*_d1*f(x) -> satisfied
+    - -2*_d1*f(x) -> satisfied
+    - -2*_d1*f(x) -> satisfied
+    - _d1 -> satisfied
+    - _d1 -> satisfied
+    - _d1 -> satisfied
+    - _v0 - 1 -> satisfied
+    - _v0 - 1 -> satisfied
+    - _v0 - 1 -> satisfied
+  required machinery (cited):
+    - general ODE solution theory (dsolve)
+    - elementary calculus: reduction of order for autonomous ODEs (chain rule)
+    - elementary integration: partial fractions / arctan; sign-case analysis of equilibria
+    - elementary calculus: reduction of order for autonomous ODEs (chain rule)
+  tactic notes:
+    - reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz
+    - T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+    - multiple distinct parameter pins found for _C1*exp(-sqrt(_d2)*x) + _C2*exp(sqrt(_d2)*x); uniqueness not established
+    - multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established
+    - multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established
+    - multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established
+
+------------------------------------------------------------------------------
+[riemann] Riemann hypothesis | xi self-duality xi(s) = xi(1-s)
+  STATUS: INCOMPLETE_PROOF_GAPS_REMAIN   (elapsed 0.18 s)
+  certified function: None
+  self-declared axioms:
+    - C1_continuity_of_f: differentiating the self-relation presupposes C^1 regularity
+  candidates:
+    - _c
+      kind=constant status=verified verified=True pin_status=free pin={} free=[_c]
+  discovered structure:
+    - 2*_d1_at_1/2 = 0
+      (consequence of the self-relation at its fixed point x* = 1/2 (order 1))
+    - Taylor recurrence around x=1/2: {'a0': '_a0', 'a2': '_a2', 'a4': '_a4', 'a6': '_a6', 'a8': '_a8'}
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  derived necessary conditions: ['2*_d1_at_1/2', '_d1_at_1/2']
+  consistency checks:
+    - 2*_d1_at_1/2 -> satisfied
+    - _d1_at_1/2 -> satisfied
+  unsettled gaps:
+    - arithmetic_atom: declared arithmetic atom 'zeta(s)' requires analytic-number-theory machinery outside symbolic tactics
+    - arithmetic_atom: declared arithmetic atom 'Euler product over the primes' requires analytic-number-theory machinery outside symbolic tactics
+    - arithmetic_atom: declared arithmetic atom 'Gamma(s/2)' requires analytic-number-theory machinery outside symbolic tactics
+  tactic notes:
+    - T4: 2 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[collatz] Collatz conjecture | parity-averaged smooth surrogate
+  STATUS: INCOMPLETE_PROOF_GAPS_REMAIN   (elapsed 0.2 s)
+  certified function: None
+  self-declared axioms:
+    - C1_continuity_of_f: differentiating the self-relation presupposes C^1 regularity
+  candidates:
+    - _c
+      kind=constant status=verified verified=True pin_status=free pin={} free=[_c]
+  discovered structure:
+    - -_d1/2 = 0
+      (consequence of the self-relation at its fixed point x* = 0 (order 1))
+    - -3*_d2/4 = 0
+      (consequence of the self-relation at its fixed point x* = 0 (order 2))
+    - _d1_at_-1/2 = 0
+      (consequence of the self-relation at its fixed point x* = -1 (order 1))
+    - 5*_d2_at_-1/4 = 0
+      (consequence of the self-relation at its fixed point x* = -1 (order 2))
+    - Taylor recurrence around x=-1: {'a0': '_a0', 'a1': '_a1', 'a2': '_a2', 'a3': '_a3', 'a4': '_a4', 'a5': '_a5', 'a6': '_a6', 'a7': '_a7', 'a8': '_a8'}
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  derived necessary conditions: ['-_d1/2', '-3*_d2/4', '_d1_at_-1/2', '5*_d2_at_-1/4', '_d1', '_d2', '_d1_at_-1', '_d2_at_-1']
+  consistency checks:
+    - -_d1/2 -> satisfied
+    - -3*_d2/4 -> satisfied
+    - _d1_at_-1/2 -> satisfied
+    - 5*_d2_at_-1/4 -> satisfied
+    - _d1 -> satisfied
+    - _d2 -> satisfied
+    - _d1_at_-1 -> satisfied
+    - _d2_at_-1 -> satisfied
+  unsettled gaps:
+    - structural_discrete: the true object lives on a discrete domain; continuous calculus tactics do not transfer
+  tactic notes:
+    - T4: 12 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[burgers_family] 1D steady Burgers u u' - nu u'' = 0 | complete branch classification
+  STATUS: PROVEN_CLASSIFICATION   (elapsed 18.24 s)
+  certified function: None
+  candidates:
+    - _C1 + x/(2*nu)
+      kind=family status=failed_verification verified=False pin_status=free pin={} free=[_C1]
+      eliminated: residual (2*_C1*nu + x)/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1, _aa]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) < -_aa']
+    - -_aa*tanh(_aa*(_C1 + x)/(2*nu))
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1, _aa]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', '-_aa < u(x) < _aa']
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1, _aa]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) > _aa']
+    - -2*nu/(_C1 + x)
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) < 0']
+      domain guards: ['denominator nonzero: _C1 + x != 0', 'x != -_C1']
+    - -2*nu/(_C1 + x)
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) > 0']
+      domain guards: ['denominator nonzero: _C1 + x != 0', 'x != -_C1']
+    - _bb*tan(_bb*(_C1 + x)/(2*nu))
+      kind=family status=verified verified=True pin_status=free pin={} free=[_C1, _bb]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) < 0 (no real equilibria)', 'u(x) in R (no equilibria on the real line)']
+      domain guards: ['cos(_bb*(_C1 + x)/(2*nu)) != 0']
+    - _c
+      kind=constant status=verified verified=True pin_status=free pin={} free=[_c]
+  eliminated branches:
+    - _C1 + x/(2*nu)  reason: residual (2*_C1*nu + x)/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)
+  discovered structure:
+    - Derivative(u(x), x) - u(x)**2/(2*nu) = const
+      (first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent))
+    - u(x) = c (constant), c in [-sqrt(2)*sqrt(nu)*sqrt(-_C1), sqrt(2)*sqrt(nu)*sqrt(-_C1)] (equilibria of u' = g(u)); every constant c is a solution of the
+      (equilibrium/constant branch of the autonomous flow)
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a1', 'a2': '_a0*_a1/(2*nu)', 'a3': '_a1*(_a0**2 + _a1*nu)/(6*nu**2)', 'a4': '_a0*_a1*(_a0**2 + 4*_
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - elementary calculus: reduction of order for autonomous ODEs (chain rule)
+    - general ODE solution theory (dsolve)
+    - elementary integration: partial fractions / arctan; sign-case analysis of equilibria
+  tactic notes:
+    - T3: dsolve failed on Eq(Derivative(u(x), (x, 2)), u(x)*Derivative(u(x), x)/nu) (The given ODE -nu*Derivative(u(x), (x, 2))/u(x) + Derivative(u(x), x) cannot be solved by 
+    - reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz
+    - T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[burgers_ivp] 1D steady Burgers | IVP u(0)=1, u'(0)=0
+  STATUS: PROVEN_EXACT   (elapsed 17.03 s)
+  certified function: 1
+  candidates:
+    - _C1 + x/(2*nu)
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) < -_aa']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*tanh(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', '-_aa < u(x) < _aa']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) > _aa']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -2*nu/(_C1 + x)
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) < 0']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -2*nu/(_C1 + x)
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) > 0']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - _bb*tan(_bb*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) < 0 (no real equilibria)', 'u(x) in R (no equilibria on the real line)']
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - 1
+      kind=constant status=verified verified=True pin_status=pinned pin={'_c': '1'} free=[]
+  eliminated branches:
+    - _C1 + x/(2*nu)  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*tanh(_aa*(_C1 + x)/(2*nu))  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -2*nu/(_C1 + x)  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -2*nu/(_C1 + x)  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - _bb*tan(_bb*(_C1 + x)/(2*nu))  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+  discovered structure:
+    - Derivative(u(x), x) - u(x)**2/(2*nu) = const
+      (first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent))
+    - u(x) = c (constant), c in [-sqrt(2)*sqrt(nu)*sqrt(-_C1), sqrt(2)*sqrt(nu)*sqrt(-_C1)] (equilibria of u' = g(u)); every constant c is a solution of the
+      (equilibrium/constant branch of the autonomous flow)
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a1', 'a2': '_a0*_a1/(2*nu)', 'a3': '_a1*(_a0**2 + _a1*nu)/(6*nu**2)', 'a4': '_a0*_a1*(_a0**2 + 4*_
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - elementary calculus: reduction of order for autonomous ODEs (chain rule)
+    - general ODE solution theory (dsolve)
+    - elementary integration: partial fractions / arctan; sign-case analysis of equilibria
+  tactic notes:
+    - T3: dsolve failed on Eq(Derivative(u(x), (x, 2)), u(x)*Derivative(u(x), x)/nu) (The given ODE -nu*Derivative(u(x), (x, 2))/u(x) + Derivative(u(x), x) cannot be solved by 
+    - reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz
+    - T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[burgers_singular] 1D steady Burgers | singular-branch IVP u(0)=-2nu, u'(0)=2nu
+  STATUS: PROVEN_EXACT   (elapsed 38.52 s)
+  certified function: -2*nu/(x + 1)
+  candidates:
+    - -2*nu + x/(2*nu)
+      kind=family status=failed_verification verified=False pin_status=pinned pin={'_C1': '-2*nu'} free=[]
+      branch conds: ['-2*nu + 1/(2*nu)']
+      eliminated: residual -1 + x/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) < -_aa']
+      eliminated: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(-_aa + 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - -_aa*tanh(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', '-_aa < u(x) < _aa']
+      eliminated: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(_aa - 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)', 'u(x) > _aa']
+      eliminated: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(-_aa + 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - -2*nu/(x + 1)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '1'} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) < 0']
+      domain guards: ['denominator nonzero: x + 1 != 0', 'x != -1']
+    - -2*nu/(x + 1)
+      kind=family status=verified verified=True pin_status=pinned pin={'_C1': '1'} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)', 'u(x) > 0']
+      domain guards: ['denominator nonzero: x + 1 != 0', 'x != -1']
+    - _bb*tan(_bb*(_C1 + x)/(2*nu))
+      kind=family status=eliminated verified=False pin_status=None pin={} free=[]
+      branch conds: ['-sqrt(2)*sqrt(nu)*sqrt(-_C1) < 0 (no real equilibria)', 'u(x) in R (no equilibria on the real line)']
+      eliminated: branch condition tan(_C1*_bb/(2*nu)) = -2*nu/_bb has no finite real solution (boundary/degenerate value)
+    - _c
+      kind=constant status=eliminated verified=False pin_status=None pin={} free=[]
+      eliminated: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+  eliminated branches:
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))  reason: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(-_aa + 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - -_aa*tanh(_aa*(_C1 + x)/(2*nu))  reason: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(_aa - 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - -_aa*coth(_aa*(_C1 + x)/(2*nu))  reason: branch condition exp(-_C1*_aa/(2*nu)) = sqrt(-_aa + 2*nu)/sqrt(_aa + 2*nu) has no finite real solution (boundary/degenerate value)
+    - _bb*tan(_bb*(_C1 + x)/(2*nu))  reason: branch condition tan(_C1*_bb/(2*nu)) = -2*nu/_bb has no finite real solution (boundary/degenerate value)
+    - _c  reason: boundary conditions unsatisfiable on this branch (exhaustive sequential search)
+    - -2*nu + x/(2*nu)  reason: residual -1 + x/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)
+  discovered structure:
+    - Derivative(u(x), x) - u(x)**2/(2*nu) = const
+      (first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent))
+    - u(x) = c (constant), c in [-sqrt(2)*sqrt(nu)*sqrt(-_C1), sqrt(2)*sqrt(nu)*sqrt(-_C1)] (equilibria of u' = g(u)); every constant c is a solution of the
+      (equilibrium/constant branch of the autonomous flow)
+    - Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a1', 'a2': '_a0*_a1/(2*nu)', 'a3': '_a1*(_a0**2 + _a1*nu)/(6*nu**2)', 'a4': '_a0*_a1*(_a0**2 + 4*_
+      (coefficients of any analytic solution (partial determination up to series order 8))
+  required machinery (cited):
+    - elementary calculus: reduction of order for autonomous ODEs (chain rule)
+    - general ODE solution theory (dsolve)
+    - elementary integration: partial fractions / arctan; sign-case analysis of equilibria
+  tactic notes:
+    - T3: dsolve failed on Eq(Derivative(u(x), (x, 2)), u(x)*Derivative(u(x), x)/nu) (The given ODE -nu*Derivative(u(x), (x, 2))/u(x) + Derivative(u(x), x) cannot be solved by 
+    - reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz
+    - T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)
+
+------------------------------------------------------------------------------
+[ns3d] 3D Navier-Stokes global regularity | context only
+  STATUS: INCOMPLETE_PROOF_GAPS_REMAIN   (elapsed 0.0 s)
+  certified function: None
+  candidates:
+  unsettled gaps:
+    - structural_pde: constraint field is a multi-dimensional PDE; no SymPy ODE/algebraic elimination tactic can close it
+
+==============================================================================
+ASSERTION TEST SUITE
+==============================================================================
+  [PASS] fix A: d'Alembert run completed without BooleanTrue crash
+  [PASS] fix A: truth_of classifies collapsed Eq
+  [PASS] cauchy absolute mode refuses certification
+  [PASS] cauchy absolute mode reports the regularity gap
+  [PASS] cauchy absolute mode still discovers the exp family (T4)
+  [PASS] cauchy pinned run reaches PROVEN_EXACT
+  [PASS] cauchy pinned predict(1) = exp(2)
+  [PASS] cauchy classified run reaches PROVEN_CLASSIFICATION
+  [PASS] cauchy classification keeps predict() locked (parametric family)
+  [PASS] dalembert C^k escalation recorded the C2 axiom (fix B)
+  [PASS] dalembert no artificial _k0 constants (fix C)
+  [PASS] dalembert series discovery free of the aux variable (fix D)
+  [PASS] dalembert reaches PROVEN_CLASSIFICATION with a cosh family
+  [PASS] dalembert family verified against the functional equation
+  [PASS] dalembert free parameter is the semantic f''(0)
+  [PASS] burgers family enumerates all five branch classes (fix E)
+  [PASS] every non-constant burgers branch carries recorded conditions (fix E)
+  [PASS] burgers first integral discovered autonomously
+  [PASS] burgers family reaches PROVEN_CLASSIFICATION
+  [PASS] burgers IVP reaches PROVEN_EXACT
+  [PASS] burgers IVP certifies u == 1
+  [PASS] burgers IVP predict(5) = 1
+  [PASS] burgers IVP eliminated branches all carry reasons
+  [PASS] burgers singular IVP reaches PROVEN_EXACT
+  [PASS] burgers singular IVP certifies the rational shock -2nu/(x+1)
+  [PASS] burgers singular IVP predict(2) = -2nu/3
+  [PASS] burgers singular IVP records the pole guard x != -1 (fix E)
+  [PASS] riemann NOT certified (strict non-settlement)
+  [PASS] riemann reports unsettled gaps / declared machinery
+  [PASS] collatz NOT certified (strict non-settlement)
+  [PASS] collatz reports unsettled gaps / declared machinery
+  [PASS] ns3d NOT certified (strict non-settlement)
+  [PASS] ns3d reports unsettled gaps / declared machinery
+  [PASS] riemann discovers xi'(1/2) = 0 and the even critical-line expansion
+  [PASS] collatz surrogate yields the constant invariant and nothing more
+  [PASS] disease growth reaches PROVEN_CLASSIFICATION
+  [PASS] disease growth discovers the exponential progression family D0*exp(k*t)
+  [PASS] disease growth family satisfies the ODE exactly
+  [PASS] disease logistic reaches PROVEN_CLASSIFICATION
+  [PASS] disease logistic discovers the closed-form capacity-limited family
+  [PASS] disease logistic family satisfies the logistic ODE exactly
+  [PASS] disease logistic family saturates at the capacity K
+  [PASS] drug PK reaches PROVEN_EXACT
+  [PASS] drug PK certifies the saturation curve (R/k)(1 - exp(-k t))
+  [PASS] drug PK predict(0) = 0 (no drug at baseline)
+  [PASS] drug PK steady-state limit is the infusion plateau R/k
+  [PASS] drug-disease interaction reaches PROVEN_CLASSIFICATION
+  [PASS] drug-disease interaction discovers the exponential clearance family
+  [PASS] drug-disease pinned run reaches PROVEN_EXACT
+  [PASS] drug-disease pinned certifies exp((g - k c) t)
+  [PASS] drug-disease cure law: load decays iff exposure beats progression (k c > g)
+  [PASS] fix E: no logcombine call anywhere in engine source (AST scan)
+
+  52/52 checks passed

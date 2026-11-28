@@ -1,0 +1,237 @@
+{
+  "problem": "1D steady Burgers u u' - nu u'' = 0 | complete branch classification",
+  "status": "PROVEN_CLASSIFICATION",
+  "certified_fn": null,
+  "elapsed_s": 18.24,
+  "axioms": [],
+  "gaps": [],
+  "machinery": [
+    "elementary calculus: reduction of order for autonomous ODEs (chain rule)",
+    "general ODE solution theory (dsolve)",
+    "elementary integration: partial fractions / arctan; sign-case analysis of equilibria"
+  ],
+  "discovered": [
+    {
+      "formula": "Derivative(u(x), x) - u(x)**2/(2*nu) = const",
+      "meaning": "first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent)"
+    },
+    {
+      "formula": "u(x) = c (constant), c in [-sqrt(2)*sqrt(nu)*sqrt(-_C1), sqrt(2)*sqrt(nu)*sqrt(-_C1)] (equilibria of u' = g(u)); every constant c is a solution of the raw equation with the invariant value fixed by g(c) = 0",
+      "meaning": "equilibrium/constant branch of the autonomous flow"
+    },
+    {
+      "formula": "Taylor recurrence around x=0: {'a0': '_a0', 'a1': '_a1', 'a2': '_a0*_a1/(2*nu)', 'a3': '_a1*(_a0**2 + _a1*nu)/(6*nu**2)', 'a4': '_a0*_a1*(_a0**2 + 4*_a1*nu)/(24*nu**3)', 'a5': '_a1*(_a0**4 + 11*_a0**2*_a1*nu + 4*_a1**2*nu**2)/(120*nu**4)', 'a6': '_a0*_a1*(_a0**4 + 26*_a0**2*_a1*nu + 34*_a1**2*nu**2)/(720*nu**5)', 'a7': '_a1*(_a0**6 + 57*_a0**4*_a1*nu + 180*_a0**2*_a1**2*nu**2 + 34*_a1**3*nu**3)/(5040*nu**6)', 'a8': '_a0*_a1*(_a0**6 + 120*_a0**4*_a1*nu + 768*_a0**2*_a1**2*nu**2 + 496*_a1**3*nu**3)/(40320*nu**7)'}",
+      "meaning": "coefficients of any analytic solution (partial determination up to series order 8)"
+    }
+  ],
+  "derived_conditions": [],
+  "candidates": [
+    {
+      "expr": "_C1 + x/(2*nu)",
+      "kind": "family",
+      "source": "T3:dsolve(declared:0+reduction)",
+      "sources": [
+        "T3:dsolve(declared:0+reduction)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "failed_verification",
+      "pin": {},
+      "free_params": [
+        "_C1"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": "residual (2*_C1*nu + x)/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)"
+    },
+    {
+      "expr": "-_aa*coth(_aa*(_C1 + x)/(2*nu))",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)",
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)",
+        "u(x) < -_aa"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1",
+        "_aa"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "-_aa*tanh(_aa*(_C1 + x)/(2*nu))",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)",
+        "-_aa < u(x) < _aa"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1",
+        "_aa"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "-_aa*coth(_aa*(_C1 + x)/(2*nu))",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) > 0 (two real equilibria)",
+        "u(x) > _aa"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1",
+        "_aa"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "-2*nu/(_C1 + x)",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)",
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)",
+        "u(x) < 0"
+      ],
+      "domain_guards": [
+        "denominator nonzero: _C1 + x != 0",
+        "x != -_C1"
+      ],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "-2*nu/(_C1 + x)",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) = 0 (double equilibrium)",
+        "u(x) > 0"
+      ],
+      "domain_guards": [
+        "denominator nonzero: _C1 + x != 0",
+        "x != -_C1"
+      ],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "_bb*tan(_bb*(_C1 + x)/(2*nu))",
+      "kind": "family",
+      "source": "T3:separation(declared:0+branch-enum)",
+      "sources": [
+        "T3:separation(declared:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(2)*sqrt(nu)*sqrt(-_C1) < 0 (no real equilibria)",
+        "u(x) in R (no equilibria on the real line)"
+      ],
+      "domain_guards": [
+        "cos(_bb*(_C1 + x)/(2*nu)) != 0"
+      ],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_C1",
+        "_bb"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "_c",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_c"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "_C1 + x/(2*nu)",
+      "reason": "residual (2*_C1*nu + x)/(4*nu**2) != 0 on -nu*Derivative(u(x), (x, 2)) + u(x)*Derivative(u(x), x)"
+    }
+  ],
+  "consistency_checks": [],
+  "derivation_chain": [
+    "T3: reduction of order -> p(u) = _C1 + _uu**2/(2*nu); first integral Derivative(u(x), x) - u(x)**2/(2*nu) = const",
+    "T3: dsolve on Eq(Derivative(u(x), x), _C1 + u(x)**2/(2*nu)) -> _C1 + x/(2*nu)",
+    "T3: branch enumeration for declared:0+branch-enum: 3 sign-case(s), 7 candidates total so far"
+  ],
+  "tactic_notes": [
+    "T3: dsolve failed on Eq(Derivative(u(x), (x, 2)), u(x)*Derivative(u(x), x)/nu) (The given ODE -nu*Derivative(u(x), (x, 2))/u(x) + Derivative(u(x), x) cannot be solved by the factorable group method)",
+    "reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz",
+    "T4: 15 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Verify each constraint residual simplifies to 0 under the recorded domain/branch conditions (algebraic certificate).",
+    "Re-derive the reduction chain in a formal kernel (differentiation + evaluation at the identity/fixed point).",
+    "Check branch-enumeration completeness: every branch verified or eliminated with its recorded reason.",
+    "Check the parameter-pinning solve of the boundary system."
+  ]
+}

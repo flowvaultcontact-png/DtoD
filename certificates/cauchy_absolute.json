@@ -1,0 +1,132 @@
+{
+  "problem": "Cauchy exponential equation | absolute mode (no regularity declared)",
+  "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
+  "certified_fn": null,
+  "elapsed_s": 1.32,
+  "axioms": [],
+  "gaps": [
+    {
+      "tag": "C1_continuity_of_f_at_y=0_not_declared",
+      "detail": "engine needs C^1 regularity to reduce; absolute mode leaves the reduction unavailable"
+    }
+  ],
+  "machinery": [],
+  "discovered": [
+    {
+      "formula": "f(x) = exp(_a1*(x-0))",
+      "meaning": "closed form synthesised from the Taylor-coefficient pattern a_k = a1^k / k! (verified independently afterwards)"
+    }
+  ],
+  "derived_conditions": [
+    "_v0 - 1"
+  ],
+  "candidates": [
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T4:series-constant",
+      "sources": [
+        "T4:series-constant"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "exp(_d1*x)",
+      "kind": "family",
+      "source": "T4:series-synthesis(exp)",
+      "sources": [
+        "T4:series-synthesis(exp)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_d1"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "1",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "absorbed",
+      "pin": {},
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    }
+  ],
+  "consistency_checks": [
+    {
+      "condition": "constant candidate 1 is the {_d1: 0} slice of family exp(_d1*x)",
+      "family": "exp(_d1*x)",
+      "result": "absorbed"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "exp(_d1*x)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "1",
+      "result": "satisfied"
+    }
+  ],
+  "derivation_chain": [
+    "T2: no usable ODE reduction for this functional equation up to k=3",
+    "T5: disjunctive factor _v0 - 1 = 0 is a derived necessary condition"
+  ],
+  "tactic_notes": [
+    "T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Discharge every listed unsettled gap in a formal kernel before any certification claim is admissible."
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "problem": "Collatz conjecture | parity-averaged smooth surrogate",
+  "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
+  "certified_fn": null,
+  "elapsed_s": 0.2,
+  "axioms": [
+    {
+      "tag": "C1_continuity_of_f",
+      "self_declared": true,
+      "reason": "differentiating the self-relation presupposes C^1 regularity"
+    }
+  ],
+  "gaps": [
+    {
+      "tag": "structural_discrete",
+      "detail": "the true object lives on a discrete domain; continuous calculus tactics do not transfer"
+    }
+  ],
+  "machinery": [],
+  "discovered": [
+    {
+      "formula": "-_d1/2 = 0",
+      "meaning": "consequence of the self-relation at its fixed point x* = 0 (order 1)"
+    },
+    {
+      "formula": "-3*_d2/4 = 0",
+      "meaning": "consequence of the self-relation at its fixed point x* = 0 (order 2)"
+    },
+    {
+      "formula": "_d1_at_-1/2 = 0",
+      "meaning": "consequence of the self-relation at its fixed point x* = -1 (order 1)"
+    },
+    {
+      "formula": "5*_d2_at_-1/4 = 0",
+      "meaning": "consequence of the self-relation at its fixed point x* = -1 (order 2)"
+    },
+    {
+      "formula": "Taylor recurrence around x=-1: {'a0': '_a0', 'a1': '_a1', 'a2': '_a2', 'a3': '_a3', 'a4': '_a4', 'a5': '_a5', 'a6': '_a6', 'a7': '_a7', 'a8': '_a8'}",
+      "meaning": "coefficients of any analytic solution (partial determination up to series order 8)"
+    }
+  ],
+  "derived_conditions": [
+    "-_d1/2",
+    "-3*_d2/4",
+    "_d1_at_-1/2",
+    "5*_d2_at_-1/4",
+    "_d1",
+    "_d2",
+    "_d1_at_-1",
+    "_d2_at_-1"
+  ],
+  "candidates": [
+    {
+      "expr": "_c",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_c"
+      ],
+      "pin_status": "free",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [],
+  "consistency_checks": [
+    {
+      "condition": "-_d1/2",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "-3*_d2/4",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1_at_-1/2",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "5*_d2_at_-1/4",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d2",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1_at_-1",
+      "family": "_c",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d2_at_-1",
+      "family": "_c",
+      "result": "satisfied"
+    }
+  ],
+  "derivation_chain": [
+    "AXIOM self-declared: C1_continuity_of_f -- differentiating the self-relation presupposes C^1 regularity",
+    "T2b: self-relation differentiated k=1, evaluated at fixed point x*=0 -> condition: -_d1/2",
+    "T2b: self-relation differentiated k=2, evaluated at fixed point x*=0 -> condition: -3*_d2/4",
+    "T2b: self-relation differentiated k=1, evaluated at fixed point x*=-1 -> condition: _d1_at_-1/2",
+    "T2b: self-relation differentiated k=2, evaluated at fixed point x*=-1 -> condition: 5*_d2_at_-1/4",
+    "T5: disjunctive factor _d1 = 0 is a derived necessary condition",
+    "T5: disjunctive factor _d2 = 0 is a derived necessary condition",
+    "T5: disjunctive factor _d1_at_-1 = 0 is a derived necessary condition",
+    "T5: disjunctive factor _d2_at_-1 = 0 is a derived necessary condition"
+  ],
+  "tactic_notes": [
+    "T4: 12 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Discharge every listed unsettled gap in a formal kernel before any certification claim is admissible."
+  ]
+}

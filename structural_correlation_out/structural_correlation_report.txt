@@ -1,0 +1,76 @@
+==============================================================================
+STRUCTURAL CORRELATION | representation-to-representation engine
+==============================================================================
+input sha256 (the only information the derivation received): 3c306b0078f41d94...
+
+Phi(D, M) -- the mathematical fingerprint (example: ds1 x mol_a)
+  C_struct         = 1
+  E_binding        = -5
+  b                = 1
+  kappa*c          = 5/2
+  exposure_margin  = 24/25
+  E_anti           = 4
+  L_before         = 37/300
+  L_after          = 1/300
+  gates            = {'structural': True, 'binding': True, 'functional': True, 'pathway': True, 'dynamic': True, 'exposure': True, 'safety': True}
+  B = 1,  C = 1
+
+THE CENTRAL DERIVATION  M*(D) = argmin L(D, T(D, M)) s.t. B = 1
+  ds1: M* = mol_a  L* = 1/300  (feasible: ['mol_a'])
+  ds2: M* = mol_b  L* = 0  (feasible: ['mol_b', 'mol_c'])
+  ds3: M* = mol_c  L* = 1/300  (feasible: ['mol_c'])
+  ds4: M* = mol_e  L* = 0  (feasible: ['mol_a', 'mol_e'])
+
+THE CAUSAL CHAIN (each link independently testable)
+  Molecule -> Binding -> Biological change -> Disease-state change
+  gates: structural, binding, functional, pathway, dynamic, exposure, safety
+
+==============================================================================
+PROOF BATTERY
+==============================================================================
+  [PROVED    ] L-identity[ds1]: L(T(D,M)) = L(D) - w b (2 - b) (P_t - H_t)^2 (exact, symbolic in b)
+  [PROVED    ] L-decreases[ds1]: intervention strictly decreases L on every dysregulated coordinate (causal effect exists)
+  [PROVED    ] J-certified[ds1]: untreated dynamics engine-certified, exact residual 0
+  [PROVED    ] N-reachable[ds1]: every dysregulated pathway reachable from a declared driver in the network N
+  [PROVED    ] L-identity[ds2]: L(T(D,M)) = L(D) - w b (2 - b) (P_t - H_t)^2 (exact, symbolic in b)
+  [PROVED    ] L-decreases[ds2]: intervention strictly decreases L on every dysregulated coordinate (causal effect exists)
+  [PROVED    ] J-certified[ds2]: untreated dynamics engine-certified, exact residual 0
+  [PROVED    ] N-reachable[ds2]: every dysregulated pathway reachable from a declared driver in the network N
+  [PROVED    ] L-identity[ds3]: L(T(D,M)) = L(D) - w b (2 - b) (P_t - H_t)^2 (exact, symbolic in b)
+  [PROVED    ] L-decreases[ds3]: intervention strictly decreases L on every dysregulated coordinate (causal effect exists)
+  [PROVED    ] J-certified[ds3]: untreated dynamics engine-certified, exact residual 0
+  [PROVED    ] N-reachable[ds3]: every dysregulated pathway reachable from a declared driver in the network N
+  [PROVED    ] L-identity[ds4]: L(T(D,M)) = L(D) - w b (2 - b) (P_t - H_t)^2 (exact, symbolic in b)
+  [PROVED    ] L-decreases[ds4]: intervention strictly decreases L on every dysregulated coordinate (causal effect exists)
+  [PROVED    ] J-certified[ds4]: untreated dynamics engine-certified, exact residual 0
+  [PROVED    ] N-reachable[ds4]: every dysregulated pathway reachable from a declared driver in the network N
+  [PROVED    ] T8[mol_a]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_a]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_a]: canonical signature identical under renumbering
+  [PROVED    ] T8[mol_b]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_b]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_b]: canonical signature identical under renumbering
+  [PROVED    ] T8[mol_c]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_c]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_c]: canonical signature identical under renumbering
+  [PROVED    ] T8[mol_d]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_d]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_d]: canonical signature identical under renumbering
+  [PROVED    ] T8[mol_e]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_e]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_e]: canonical signature identical under renumbering
+  [PROVED    ] T8[mol_f]: renumbering phi leaves every invariant unchanged (representation invariance)
+  [PROVED    ] valid[mol_f]: chemically valid (valence + connectivity)
+  [PROVED    ] canonical[mol_f]: canonical signature identical under renumbering
+  [PROVED    ] R1[gates]: causal chain: B = 1 <=> every one of the 7 independently testable gates passes <=> C(D, M) > 0 (derived, all pairs)
+  [PROVED    ] T8[invariance]: representation invariance: renumbering atoms (phi) changes neither Phi(D, M) nor B (f(phi(D), phi(M)) = f(D, M))
+  [PROVED    ] T9[sufficiency]: structural sufficiency: physically equivalent molecules (identical canonical signature) have identical Phi and B
+  [PROVED    ] T10[correlation]: independent correlation: the 3D prediction implies the 2D structural condition; every 2D-yes/3D-no divergence is caused by a molecule-dependent physical gate (geometry, energy, dynamics, exposure, safety) -- never by an identifier (11 divergences = the information gain of 3D)
+  [PROVED    ] T11[causal]: causal consistency: every predicted-successful interaction produces the predicted disease-state change under the intervention equations (L strictly decreases, exact)
+  [PROVED    ] R2[ds1]: M*(D) = argmin_{M in M_valid} L(D, T(D, M)) s.t. B = 1 (exhaustively verified over the valid space)
+  [PROVED    ] R2[ds2]: M*(D) = argmin_{M in M_valid} L(D, T(D, M)) s.t. B = 1 (exhaustively verified over the valid space)
+  [PROVED    ] R2[ds3]: M*(D) = argmin_{M in M_valid} L(D, T(D, M)) s.t. B = 1 (exhaustively verified over the valid space)
+  [PROVED    ] R2[ds4]: M*(D) = argmin_{M in M_valid} L(D, T(D, M)) s.t. B = 1 (exhaustively verified over the valid space)
+  [PROVED    ] R3[hermetic]: derivation/validation separation: no validation or pairing module present in the derivation-time module table
+
+  44/44 theorems PROVED  (elapsed 1.44 s)

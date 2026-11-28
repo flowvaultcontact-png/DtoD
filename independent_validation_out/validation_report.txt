@@ -1,0 +1,11 @@
+==============================================================================
+INDEPENDENT VALIDATION | blind tests
+==============================================================================
+  [PASS] V1[name-blindness]: all predictions identical under label stripping + permutation
+  [PASS] V2[corpus-blindness]: derivation-time module snapshot contains no validation module
+  [PASS] V3[representation-only]: no module-level molecule->disease pairing table in any derivation source (AST scan)
+  [PASS] V4[novel-structures]: held-out structures and labels are absent from the derivation corpus (genuinely novel inputs)
+  [PASS] V4[blind-discovery]: engine predictions on held-out structures match the independently declared outcomes
+  [PASS] V4[blind-M-star]: blind discovery: the held-out disease state is solved from representations alone -- the held-out novel structure is in the derived feasible set and L* = 0 (full recovery of the healthy state)
+
+  6/6 validation checks passed

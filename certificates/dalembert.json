@@ -1,0 +1,432 @@
+{
+  "problem": "d'Alembert cosine equation f(x+y)+f(x-y) = 2 f(x) f(y)",
+  "status": "PROVEN_CLASSIFICATION",
+  "certified_fn": null,
+  "elapsed_s": 11.61,
+  "axioms": [
+    {
+      "tag": "C2_continuity_of_f_at_y=0",
+      "self_declared": true,
+      "reason": "differentiating the functional equation 2 time(s) in y and evaluating at y=0 presupposes C^2 regularity; without it Hamel-type wild solutions survive"
+    }
+  ],
+  "gaps": [],
+  "machinery": [
+    "general ODE solution theory (dsolve)",
+    "elementary calculus: reduction of order for autonomous ODEs (chain rule)",
+    "elementary integration: partial fractions / arctan; sign-case analysis of equilibria",
+    "elementary calculus: reduction of order for autonomous ODEs (chain rule)"
+  ],
+  "discovered": [
+    {
+      "formula": "sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const",
+      "meaning": "first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent)"
+    },
+    {
+      "formula": "u(x) = c (constant), c in [-sqrt(-_C1/_d2), sqrt(-_C1/_d2)] (equilibria of u' = g(u)); every constant c is a solution of the raw equation with the invariant value fixed by g(c) = 0",
+      "meaning": "equilibrium/constant branch of the autonomous flow"
+    },
+    {
+      "formula": "-sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const",
+      "meaning": "first integral discovered by autonomous reduction of order (invariant along solutions; any nonzero multiple is equivalent)"
+    },
+    {
+      "formula": "u(x) = c (constant), c in [-sqrt(-_C1/_d2), sqrt(-_C1/_d2)] (equilibria of u' = g(u)); every constant c is a solution of the raw equation with the invariant value fixed by g(c) = 0",
+      "meaning": "equilibrium/constant branch of the autonomous flow"
+    },
+    {
+      "formula": "f(x) = cosh(sqrt(2*_a2)*(x-0))",
+      "meaning": "even closed form synthesised from the recurrence a_{2m} = (2a2)^m / (2m)! (verified independently afterwards)"
+    }
+  ],
+  "derived_conditions": [
+    "-2*_d1*f(x)",
+    "_d1",
+    "_v0 - 1"
+  ],
+  "candidates": [
+    {
+      "expr": "cosh(sqrt(_d2)*x)",
+      "kind": "family",
+      "source": "T3:dsolve(derived:0)",
+      "sources": [
+        "T3:dsolve(derived:0)",
+        "T4:series-synthesis(cosh)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "1/2",
+        "_C2": "1/2"
+      },
+      "free_params": [
+        "_d2"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "kind": "family",
+      "source": "T3:dsolve(derived:0+reduction)",
+      "sources": [
+        "T3:dsolve(derived:0+reduction)",
+        "T3:dsolve(derived:0+reduction)",
+        "T3:separation(derived:0+branch-enum)",
+        "T3:separation(derived:0+branch-enum)",
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "2**(1/3)*pi**(2/3)/2",
+        "_d2": "-2**(1/3)*pi**(2/3)/2"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "u(x) < -sqrt(-_C1/_d2)",
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "domain_guards": [],
+      "verified": false,
+      "status": "failed_verification",
+      "pin": {
+        "_C1": "-I*pi/(2*sqrt(_d2))"
+      },
+      "free_params": [
+        "_d2"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "eliminated_reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(-_C1/_d2) < u(x) < sqrt(-_C1/_d2)",
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "domain_guards": [],
+      "verified": false,
+      "status": "failed_verification",
+      "pin": {
+        "_C1": "-I*pi/(2*sqrt(_d2))"
+      },
+      "free_params": [
+        "_d2"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "eliminated_reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "u(x) > sqrt(-_C1/_d2)",
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "domain_guards": [],
+      "verified": false,
+      "status": "failed_verification",
+      "pin": {
+        "_C1": "-I*pi/(2*sqrt(_d2))"
+      },
+      "free_params": [
+        "_d2"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [
+        "-1 + sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))/(2*sqrt(_d2))"
+      ],
+      "eliminated_reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    },
+    {
+      "expr": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "kind": "family",
+      "source": "T3:dsolve(derived:0+reduction)",
+      "sources": [
+        "T3:dsolve(derived:0+reduction)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "2**(1/3)*pi**(2/3)/2",
+        "_d2": "-2**(1/3)*pi**(2/3)/2"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "u(x) < -sqrt(-_C1/_d2)"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "2**(1/3)*pi**(2/3)/2",
+        "_d2": "-2**(1/3)*pi**(2/3)/2"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "-sqrt(-_C1/_d2) < u(x) < sqrt(-_C1/_d2)"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "2**(1/3)*pi**(2/3)/2",
+        "_d2": "-2**(1/3)*pi**(2/3)/2"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "kind": "family",
+      "source": "T3:separation(derived:0+branch-enum)",
+      "sources": [
+        "T3:separation(derived:0+branch-enum)"
+      ],
+      "branch_conds": [
+        "u(x) > sqrt(-_C1/_d2)"
+      ],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {
+        "_C1": "2**(1/3)*pi**(2/3)/2",
+        "_d2": "-2**(1/3)*pi**(2/3)/2"
+      },
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T4:series-constant",
+      "sources": [
+        "T4:series-constant"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "cosh(sqrt(_d2)*x)",
+      "kind": "family",
+      "source": "T4:series-synthesis(cosh)",
+      "sources": [
+        "T4:series-synthesis(cosh)"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "verified",
+      "pin": {},
+      "free_params": [
+        "_d2"
+      ],
+      "pin_status": "partially_pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    },
+    {
+      "expr": "0",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": false,
+      "status": "eliminated",
+      "pin": {},
+      "free_params": [],
+      "pin_status": null,
+      "unresolved_conds": [],
+      "eliminated_reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "1",
+      "kind": "constant",
+      "source": "T5:constant-ansatz",
+      "sources": [
+        "T5:constant-ansatz"
+      ],
+      "branch_conds": [],
+      "domain_guards": [],
+      "verified": true,
+      "status": "absorbed",
+      "pin": {},
+      "free_params": [],
+      "pin_status": "pinned",
+      "unresolved_conds": [],
+      "eliminated_reason": null
+    }
+  ],
+  "eliminated_branches": [
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "0",
+      "reason": "violates boundary condition f^(0)(0) = 1"
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    },
+    {
+      "expr": "sqrt(2)*I*sqrt(pi)*sqrt(-I/sqrt(_d2))*cosh(sqrt(_d2)*x)/(2*sqrt(_d2))",
+      "reason": "residual I*(sqrt(2)*sqrt(pi)*_d2*sqrt(-I/sqrt(_d2)) - pi)*cosh(sqrt(_d2)*x)*cosh(sqrt(_d2)*y)/_d2**(3/2) != 0 on -2*f(x)*f(y) + f(x - y) + f(x + y)"
+    }
+  ],
+  "consistency_checks": [
+    {
+      "condition": "constant candidate 1 is the {_d2: 0} slice of family cosh(sqrt(_d2)*x)",
+      "family": "cosh(sqrt(_d2)*x)",
+      "result": "absorbed"
+    },
+    {
+      "condition": "-2*_d1*f(x)",
+      "family": "cosh(sqrt(_d2)*x)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "-2*_d1*f(x)",
+      "family": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "-2*_d1*f(x)",
+      "family": "1",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1",
+      "family": "cosh(sqrt(_d2)*x)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1",
+      "family": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_d1",
+      "family": "1",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "cosh(sqrt(_d2)*x)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "cos(2**(2/3)*pi**(1/3)*x/2)",
+      "result": "satisfied"
+    },
+    {
+      "condition": "_v0 - 1",
+      "family": "1",
+      "result": "satisfied"
+    }
+  ],
+  "derivation_chain": [
+    "T2: k=1 reduction is derivative-free -> necessary condition: -2*_d1*f(x)",
+    "AXIOM self-declared: C2_continuity_of_f_at_y=0 -- differentiating the functional equation 2 time(s) in y and evaluating at y=0 presupposes C^2 regularity; without it Hamel-type wild solutions survive",
+    "T2: functional equation differentiated k=2 in y, evaluated at y=0 under axiom C2_continuity_of_f_at_y=0 -> ODE residual: -2*_d2*f(x) + 2*Derivative(f(x), (x, 2))",
+    "T3: dsolve on Eq(Derivative(f(x), (x, 2)), _d2*f(x)) -> _C1*exp(-sqrt(_d2)*x) + _C2*exp(sqrt(_d2)*x)",
+    "T3: reduction of order -> p(u) = -sqrt(_C1 + _d2*_uu**2); first integral sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const",
+    "T3: dsolve on Eq(Derivative(f(x), x), -sqrt(_C1 + _d2*f(x)**2)) -> sqrt(_C1)*sinh(sqrt(_d2)*(_C1 - x))/sqrt(_d2)",
+    "T3: branch enumeration for derived:0+branch-enum: 1 sign-case(s), 5 candidates total so far",
+    "T3: reduction of order -> p(u) = sqrt(_C1 + _d2*_uu**2); first integral -sqrt(_C1 + _d2*f(x)**2) + Derivative(f(x), x) = const",
+    "T3: dsolve on Eq(Derivative(f(x), x), sqrt(_C1 + _d2*f(x)**2)) -> sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2)",
+    "T3: branch enumeration for derived:0+branch-enum: 1 sign-case(s), 9 candidates total so far",
+    "T5: disjunctive factor _d1 = 0 is a derived necessary condition",
+    "T5: disjunctive factor _v0 - 1 = 0 is a derived necessary condition"
+  ],
+  "tactic_notes": [
+    "reduction of order: branch p(u) == 0 (i.e. u' == 0) yields constant solutions; these are enumerated independently by the constant ansatz",
+    "T4: 99 coefficient equations skipped as truncation artifacts (they would involve Taylor coefficients beyond order 8)",
+    "multiple distinct parameter pins found for _C1*exp(-sqrt(_d2)*x) + _C2*exp(sqrt(_d2)*x); uniqueness not established",
+    "multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established",
+    "multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established",
+    "multiple distinct parameter pins found for -sqrt(_C1)*sinh(sqrt(_d2)*(_C1 + x))/sqrt(_d2); uniqueness not established"
+  ],
+  "proof_obligations_for_formal_kernel": [
+    "Verify each constraint residual simplifies to 0 under the recorded domain/branch conditions (algebraic certificate).",
+    "Re-derive the reduction chain in a formal kernel (differentiation + evaluation at the identity/fixed point).",
+    "Check branch-enumeration completeness: every branch verified or eliminated with its recorded reason.",
+    "Check the parameter-pinning solve of the boundary system."
+  ]
+}
