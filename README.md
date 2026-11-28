@@ -124,3 +124,52 @@ Proof battery — 69/69 theorems PROVED:
 Artifacts: `disease_math_out/representations.json` (all representations in
 pluggable form), `disease_math_out/disease_math_report.txt`,
 `disease_math_out/disease_math_certificate.json`. NOT clinical advice.
+
+## Structure → structure: disease → drug by direct formula (`structure_math.py`)
+
+`structure_math.py` removes the last data dependence: no real names, no data
+matching. The chemical structure of a molecule IS its identity, represented
+as mathematics:
+
+```text
+R(d) = (T(d), g(d), Law_d)        DISEASE = its target structure
+  T(d) ⊆ GF(2)^12 structural fragments (amine, sulfonamide, aromatic ring, …)
+  g(d) progression rate; Law_d engine-certified
+
+R(m) = (χ_m, c(m))                DRUG = its molecular structure
+  χ_m ⊆ GF(2)^12 the molecule's fragments; c(m) its exposure
+```
+
+The direct formula — disease structure → drug structure, pure algebra, no
+lookup table, no corpus scan:
+
+```text
+rho(d,m)  = |T(d) ∧ χ_m| / |T(d)|                     structural affinity
+B(d,m) = 1 ⟺ rho(d,m) = 1 AND K0·c(m) > g(d)         cure law
+Drug(d) = { m : T(d) ⊆ χ_m  AND  c(m) > g(d)/K0 }     THE DIRECT FORMULA
+m*(d)  = T(d)  at c ≥ 2·g(d)/K0                       direct construction
+```
+
+The only declared axiom is binding completeness (a cure requires full
+structural coverage of the target site); everything else is derived:
+- **S2 (universal)** `rho = 1 ⟺ T(d) ⊆ χ_m` for all structure pairs
+- **S3 (universal)** the full cure-law biconditional, branch enumeration over
+  `rho ∈ {<1, =1}`
+- **S4** `m*(d) = T(d)` is a fixed point of the cure law and minimal (every
+  `B = 1` molecule contains `T(d)`)
+- **S5 (name-freeness)** the whole derivation is invariant under a label
+  permutation — `Drug(d)`, thresholds, and `B` are keyed by structure address
+  and reproduce bit-for-bit; an AST scan confirms the derivation path contains
+  no label-keyed constants
+- **S6/S7** treated family exact residual 0, strict decay; per-disease direct
+  derivation trace
+
+Proof battery — **57/57 theorems PROVED**. Run:
+
+```bash
+python3 structure_math.py
+```
+
+Artifacts: `structure_math_out/representations.json`,
+`structure_math_out/structure_math_report.txt`,
+`structure_math_out/structure_math_certificate.json`. NOT clinical advice.

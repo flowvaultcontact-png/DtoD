@@ -1,0 +1,282 @@
+{
+  "feature_space": "GF(2)^12 over structural fragments",
+  "fragments": [
+    "F_AMINE",
+    "F_HYDROXYL",
+    "F_CARBOXYL",
+    "F_SULFONAMIDE",
+    "F_AROMATIC_RING",
+    "F_HALOGEN",
+    "F_ETHER",
+    "F_KETONE",
+    "F_PYRIDINE",
+    "F_THIOPHENE",
+    "F_CYANO",
+    "F_NITRO"
+  ],
+  "K0": "3/2",
+  "diseases": {
+    "d1": {
+      "address": "T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']",
+      "T(d)": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_SULFONAMIDE"
+      ],
+      "g(d)": "1/10",
+      "untreated_law": "D'(t) = (1/10) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((1/10) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE'] subset of chi_m AND c(m) > 1/15 }",
+      "m*(d)": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_SULFONAMIDE"
+      ],
+      "c*_construction": "2/15"
+    },
+    "d2": {
+      "address": "T(d) = ['F_AROMATIC_RING', 'F_ETHER', 'F_HYDROXYL']",
+      "T(d)": [
+        "F_AROMATIC_RING",
+        "F_ETHER",
+        "F_HYDROXYL"
+      ],
+      "g(d)": "2/25",
+      "untreated_law": "D'(t) = (2/25) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((2/25) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AROMATIC_RING', 'F_ETHER', 'F_HYDROXYL'] subset of chi_m AND c(m) > 4/75 }",
+      "m*(d)": [
+        "F_AROMATIC_RING",
+        "F_ETHER",
+        "F_HYDROXYL"
+      ],
+      "c*_construction": "8/75"
+    },
+    "d3": {
+      "address": "T(d) = ['F_AMINE', 'F_PYRIDINE']",
+      "T(d)": [
+        "F_AMINE",
+        "F_PYRIDINE"
+      ],
+      "g(d)": "1/20",
+      "untreated_law": "D'(t) = (1/20) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((1/20) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AMINE', 'F_PYRIDINE'] subset of chi_m AND c(m) > 1/30 }",
+      "m*(d)": [
+        "F_AMINE",
+        "F_PYRIDINE"
+      ],
+      "c*_construction": "1/15"
+    },
+    "d4": {
+      "address": "T(d) = ['F_AROMATIC_RING', 'F_CARBOXYL']",
+      "T(d)": [
+        "F_AROMATIC_RING",
+        "F_CARBOXYL"
+      ],
+      "g(d)": "1/25",
+      "untreated_law": "D'(t) = (1/25) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((1/25) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AROMATIC_RING', 'F_CARBOXYL'] subset of chi_m AND c(m) > 2/75 }",
+      "m*(d)": [
+        "F_AROMATIC_RING",
+        "F_CARBOXYL"
+      ],
+      "c*_construction": "4/75"
+    },
+    "d5": {
+      "address": "T(d) = ['F_CYANO', 'F_SULFONAMIDE', 'F_THIOPHENE']",
+      "T(d)": [
+        "F_CYANO",
+        "F_SULFONAMIDE",
+        "F_THIOPHENE"
+      ],
+      "g(d)": "3/50",
+      "untreated_law": "D'(t) = (3/50) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((3/50) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_CYANO', 'F_SULFONAMIDE', 'F_THIOPHENE'] subset of chi_m AND c(m) > 1/25 }",
+      "m*(d)": [
+        "F_CYANO",
+        "F_SULFONAMIDE",
+        "F_THIOPHENE"
+      ],
+      "c*_construction": "2/25"
+    },
+    "d6": {
+      "address": "T(d) = ['F_AROMATIC_RING', 'F_HALOGEN', 'F_KETONE']",
+      "T(d)": [
+        "F_AROMATIC_RING",
+        "F_HALOGEN",
+        "F_KETONE"
+      ],
+      "g(d)": "3/25",
+      "untreated_law": "D'(t) = (3/25) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((3/25) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AROMATIC_RING', 'F_HALOGEN', 'F_KETONE'] subset of chi_m AND c(m) > 2/25 }",
+      "m*(d)": [
+        "F_AROMATIC_RING",
+        "F_HALOGEN",
+        "F_KETONE"
+      ],
+      "c*_construction": "4/25"
+    },
+    "d7": {
+      "address": "T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN']",
+      "T(d)": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_HALOGEN"
+      ],
+      "g(d)": "3/20",
+      "untreated_law": "D'(t) = (3/20) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((3/20) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN'] subset of chi_m AND c(m) > 1/10 }",
+      "m*(d)": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_HALOGEN"
+      ],
+      "c*_construction": "1/5"
+    },
+    "d8": {
+      "address": "T(d) = ['F_AROMATIC_RING', 'F_CYANO', 'F_HYDROXYL', 'F_KETONE']",
+      "T(d)": [
+        "F_AROMATIC_RING",
+        "F_CYANO",
+        "F_HYDROXYL",
+        "F_KETONE"
+      ],
+      "g(d)": "1/5",
+      "untreated_law": "D'(t) = (1/5) * D(t),  D(0) = D0",
+      "certified_family": "D(t) = D0 * exp((1/5) * t)",
+      "direct_formula": "Drug(d) = { m : ['F_AROMATIC_RING', 'F_CYANO', 'F_HYDROXYL', 'F_KETONE'] subset of chi_m AND c(m) > 2/15 }",
+      "m*(d)": [
+        "F_AROMATIC_RING",
+        "F_CYANO",
+        "F_HYDROXYL",
+        "F_KETONE"
+      ],
+      "c*_construction": "4/15"
+    }
+  },
+  "drugs": {
+    "mol_1": {
+      "address": "chi_m = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN', 'F_SULFONAMIDE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_HALOGEN",
+        "F_SULFONAMIDE"
+      ],
+      "c(m)": "1"
+    },
+    "mol_2": {
+      "address": "chi_m = ['F_AROMATIC_RING', 'F_ETHER', 'F_HYDROXYL', 'F_KETONE']",
+      "chi_m": [
+        "F_AROMATIC_RING",
+        "F_ETHER",
+        "F_HYDROXYL",
+        "F_KETONE"
+      ],
+      "c(m)": "9/10"
+    },
+    "mol_3": {
+      "address": "chi_m = ['F_AMINE', 'F_HALOGEN', 'F_PYRIDINE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_HALOGEN",
+        "F_PYRIDINE"
+      ],
+      "c(m)": "1"
+    },
+    "mol_4": {
+      "address": "chi_m = ['F_AROMATIC_RING', 'F_CARBOXYL', 'F_ETHER']",
+      "chi_m": [
+        "F_AROMATIC_RING",
+        "F_CARBOXYL",
+        "F_ETHER"
+      ],
+      "c(m)": "1"
+    },
+    "mol_5": {
+      "address": "chi_m = ['F_CYANO', 'F_NITRO', 'F_SULFONAMIDE', 'F_THIOPHENE']",
+      "chi_m": [
+        "F_CYANO",
+        "F_NITRO",
+        "F_SULFONAMIDE",
+        "F_THIOPHENE"
+      ],
+      "c(m)": "4/5"
+    },
+    "mol_6": {
+      "address": "chi_m = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN', 'F_KETONE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_HALOGEN",
+        "F_KETONE"
+      ],
+      "c(m)": "1"
+    },
+    "mol_7": {
+      "address": "chi_m = ['F_AMINE', 'F_AROMATIC_RING', 'F_CYANO', 'F_HYDROXYL', 'F_KETONE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_CYANO",
+        "F_HYDROXYL",
+        "F_KETONE"
+      ],
+      "c(m)": "4/5"
+    },
+    "mol_8": {
+      "address": "chi_m = ['F_AMINE', 'F_AROMATIC_RING']",
+      "chi_m": [
+        "F_AMINE",
+        "F_AROMATIC_RING"
+      ],
+      "c(m)": "1"
+    },
+    "mol_9": {
+      "address": "chi_m = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN', 'F_SULFONAMIDE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_AROMATIC_RING",
+        "F_HALOGEN",
+        "F_SULFONAMIDE"
+      ],
+      "c(m)": "1/50"
+    },
+    "mol_10": {
+      "address": "chi_m = ['F_AROMATIC_RING', 'F_CARBOXYL']",
+      "chi_m": [
+        "F_AROMATIC_RING",
+        "F_CARBOXYL"
+      ],
+      "c(m)": "1"
+    },
+    "mol_11": {
+      "address": "chi_m = ['F_AMINE', 'F_PYRIDINE']",
+      "chi_m": [
+        "F_AMINE",
+        "F_PYRIDINE"
+      ],
+      "c(m)": "9/10"
+    },
+    "mol_12": {
+      "address": "chi_m = ['F_ETHER', 'F_HYDROXYL']",
+      "chi_m": [
+        "F_ETHER",
+        "F_HYDROXYL"
+      ],
+      "c(m)": "1"
+    }
+  },
+  "direct_formulas": {
+    "rho(d,m)": "|T(d) AND chi_m| / |T(d)|",
+    "cure_law": "B(d,m) = 1 <=> rho(d,m) = 1 AND K0*c(m) > g(d)",
+    "Drug(d)": "{ m : T(d) subset of chi_m AND c(m) > g(d)/K0 }",
+    "m*(d)": "T(d) at exposure c >= 2*g(d)/K0",
+    "treated_family": "D0 * exp((g(d) - K0*c(m)) * t)"
+  }
+}

@@ -1,0 +1,446 @@
+{
+  "engine": "AutonomousProofEngine v2 + structure_math direct-formula layer",
+  "all_proved": true,
+  "n_theorems": 57,
+  "n_proved": 57,
+  "elapsed_s": 2.55,
+  "theorems": [
+    {
+      "tag": "S1[d1]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d2]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d3]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d4]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d5]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d6]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d7]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S1[d8]",
+      "claim": "law engine-certified, exact residual 0, target structure nonempty",
+      "status": "PROVED",
+      "detail": "status=PROVEN_CLASSIFICATION"
+    },
+    {
+      "tag": "S2[all-pairs]",
+      "claim": "UNIVERSAL: rho(d, m) = 1 <=> T(d) subset of chi_m (all 96 structure pairs)",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S3[all-pairs]",
+      "claim": "UNIVERSAL: B(d, m) = 1 <=> T(d) subset of chi_m AND c(m) > g(d)/K0 (all 96 pairs; branch enumeration over rho in {<1, =1})",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S4[fixed:d1]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 2/15"
+    },
+    {
+      "tag": "S4[minimal:d1]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 3"
+    },
+    {
+      "tag": "S4[fixed:d2]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 8/75"
+    },
+    {
+      "tag": "S4[minimal:d2]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 3"
+    },
+    {
+      "tag": "S4[fixed:d3]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 1/15"
+    },
+    {
+      "tag": "S4[minimal:d3]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 2"
+    },
+    {
+      "tag": "S4[fixed:d4]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 4/75"
+    },
+    {
+      "tag": "S4[minimal:d4]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 2"
+    },
+    {
+      "tag": "S4[fixed:d5]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 2/25"
+    },
+    {
+      "tag": "S4[minimal:d5]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 3"
+    },
+    {
+      "tag": "S4[fixed:d6]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 4/25"
+    },
+    {
+      "tag": "S4[minimal:d6]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 3"
+    },
+    {
+      "tag": "S4[fixed:d7]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 1/5"
+    },
+    {
+      "tag": "S4[minimal:d7]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 3"
+    },
+    {
+      "tag": "S4[fixed:d8]",
+      "claim": "m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 4/15"
+    },
+    {
+      "tag": "S4[minimal:d8]",
+      "claim": "m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|",
+      "status": "PROVED",
+      "detail": "|T(d)| = 4"
+    },
+    {
+      "tag": "S5[permutation]",
+      "claim": "NAME-FREENESS: full derivation invariant under label permutation -- Drug(d) keyed by structure address identical bit-for-bit",
+      "status": "PROVED",
+      "detail": "disease label permutation: {'d1': 'd7', 'd2': 'd8', 'd3': 'd4', 'd4': 'd1', 'd5': 'd6', 'd6': 'd5', 'd7': 'd3', 'd8': 'd2'}"
+    },
+    {
+      "tag": "S5[source]",
+      "claim": "derivation path contains no label-keyed constants (AST scan of drug_of, m_star, cure_law, rho)",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S6[residual:d1]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/10 - K0*2/15)*t)"
+    },
+    {
+      "tag": "S6[decay:d1]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -1/10"
+    },
+    {
+      "tag": "S6[residual:d2]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((2/25 - K0*8/75)*t)"
+    },
+    {
+      "tag": "S6[decay:d2]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -2/25"
+    },
+    {
+      "tag": "S6[residual:d3]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/20 - K0*1/15)*t)"
+    },
+    {
+      "tag": "S6[decay:d3]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -1/20"
+    },
+    {
+      "tag": "S6[residual:d4]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/25 - K0*4/75)*t)"
+    },
+    {
+      "tag": "S6[decay:d4]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -1/25"
+    },
+    {
+      "tag": "S6[residual:d5]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/50 - K0*2/25)*t)"
+    },
+    {
+      "tag": "S6[decay:d5]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -3/50"
+    },
+    {
+      "tag": "S6[residual:d6]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/25 - K0*4/25)*t)"
+    },
+    {
+      "tag": "S6[decay:d6]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -3/25"
+    },
+    {
+      "tag": "S6[residual:d7]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((3/20 - K0*1/5)*t)"
+    },
+    {
+      "tag": "S6[decay:d7]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -3/20"
+    },
+    {
+      "tag": "S6[residual:d8]",
+      "claim": "treated family of m*(d) solves the treated ODE exactly",
+      "status": "PROVED",
+      "detail": "rho = D0*exp((1/5 - K0*4/15)*t)"
+    },
+    {
+      "tag": "S6[decay:d8]",
+      "claim": "treated load of m*(d) strictly decays",
+      "status": "PROVED",
+      "detail": "g - k_eff = -1/5"
+    },
+    {
+      "tag": "decoy[d1|mol_8]",
+      "claim": "refused by the direct formula (structure_incomplete)",
+      "status": "PROVED",
+      "detail": "rho = 2/3, c = 1, g/K0 = 1/15"
+    },
+    {
+      "tag": "decoy[d1|mol_9]",
+      "claim": "refused by the direct formula (dose_insufficient)",
+      "status": "PROVED",
+      "detail": "rho = 1, c = 1/50, g/K0 = 1/15"
+    },
+    {
+      "tag": "decoy[d8|mol_2]",
+      "claim": "refused by the direct formula (structure_incomplete)",
+      "status": "PROVED",
+      "detail": "rho = 3/4, c = 9/10, g/K0 = 2/15"
+    },
+    {
+      "tag": "decoy[d3|mol_12]",
+      "claim": "refused by the direct formula (structure_incomplete)",
+      "status": "PROVED",
+      "detail": "rho = 0, c = 1, g/K0 = 1/30"
+    },
+    {
+      "tag": "decoy[d6|mol_9]",
+      "claim": "refused by the direct formula (structure_incomplete)",
+      "status": "PROVED",
+      "detail": "rho = 2/3, c = 1/50, g/K0 = 2/25"
+    },
+    {
+      "tag": "S7[d1]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d2]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d3]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d4]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d5]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d6]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d7]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    },
+    {
+      "tag": "S7[d8]",
+      "claim": "direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone",
+      "status": "PROVED",
+      "detail": ""
+    }
+  ],
+  "derived_Drug(d)": {
+    "d1": {
+      "Drug(d)": [
+        "mol_1"
+      ],
+      "threshold g/K0": "1/15"
+    },
+    "d2": {
+      "Drug(d)": [
+        "mol_2"
+      ],
+      "threshold g/K0": "4/75"
+    },
+    "d3": {
+      "Drug(d)": [
+        "mol_11",
+        "mol_3"
+      ],
+      "threshold g/K0": "1/30"
+    },
+    "d4": {
+      "Drug(d)": [
+        "mol_10",
+        "mol_4"
+      ],
+      "threshold g/K0": "2/75"
+    },
+    "d5": {
+      "Drug(d)": [
+        "mol_5"
+      ],
+      "threshold g/K0": "1/25"
+    },
+    "d6": {
+      "Drug(d)": [
+        "mol_6"
+      ],
+      "threshold g/K0": "2/25"
+    },
+    "d7": {
+      "Drug(d)": [
+        "mol_1",
+        "mol_6"
+      ],
+      "threshold g/K0": "1/10"
+    },
+    "d8": {
+      "Drug(d)": [
+        "mol_7"
+      ],
+      "threshold g/K0": "2/15"
+    }
+  },
+  "disease_certificates": {
+    "d1": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d2": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d3": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d4": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d5": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d6": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d7": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    },
+    "d8": {
+      "status": "PROVEN_CLASSIFICATION",
+      "family": "D0*exp(g*t)",
+      "exact_residual_zero": true
+    }
+  }
+}

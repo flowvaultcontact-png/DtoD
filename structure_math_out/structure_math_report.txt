@@ -1,0 +1,119 @@
+==============================================================================
+STRUCTURE -> STRUCTURE | disease -> drug by direct formula, no names, no data matching
+==============================================================================
+feature space: GF(2)^12 structural fragments
+corpus: 8 diseases (target structures), 12 molecules (structures)
+
+THE REPRESENTATION OF A DISEASE (example: d1)
+  address            = T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']
+  T(d)               = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']
+  g(d)               = 1/10
+  untreated_law      = D'(t) = (1/10) * D(t),  D(0) = D0
+  certified_family   = D(t) = D0 * exp((1/10) * t)
+  direct_formula     = Drug(d) = { m : ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE'] subset of chi_m AND c(m) > 1/15 }
+  m*(d)              = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']
+  c*_construction    = 2/15
+
+THE REPRESENTATION OF A DRUG (example: mol_1)
+  address            = chi_m = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN', 'F_SULFONAMIDE']
+  chi_m              = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN', 'F_SULFONAMIDE']
+  c(m)               = 1
+
+THE DIRECT FORMULAS (disease structure -> drug structure)
+  rho(d,m)       : |T(d) AND chi_m| / |T(d)|
+  cure_law       : B(d,m) = 1 <=> rho(d,m) = 1 AND K0*c(m) > g(d)
+  Drug(d)        : { m : T(d) subset of chi_m AND c(m) > g(d)/K0 }
+  m*(d)          : T(d) at exposure c >= 2*g(d)/K0
+  treated_family : D0 * exp((g(d) - K0*c(m)) * t)
+
+DERIVED Drug(d) FOR EVERY DISEASE (constructed, not matched)
+  d1: T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']
+      Drug(d) = ['mol_1']   (threshold c > 1/15)
+  d2: T(d) = ['F_AROMATIC_RING', 'F_ETHER', 'F_HYDROXYL']
+      Drug(d) = ['mol_2']   (threshold c > 4/75)
+  d3: T(d) = ['F_AMINE', 'F_PYRIDINE']
+      Drug(d) = ['mol_11', 'mol_3']   (threshold c > 1/30)
+  d4: T(d) = ['F_AROMATIC_RING', 'F_CARBOXYL']
+      Drug(d) = ['mol_10', 'mol_4']   (threshold c > 2/75)
+  d5: T(d) = ['F_CYANO', 'F_SULFONAMIDE', 'F_THIOPHENE']
+      Drug(d) = ['mol_5']   (threshold c > 1/25)
+  d6: T(d) = ['F_AROMATIC_RING', 'F_HALOGEN', 'F_KETONE']
+      Drug(d) = ['mol_6']   (threshold c > 2/25)
+  d7: T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_HALOGEN']
+      Drug(d) = ['mol_1', 'mol_6']   (threshold c > 1/10)
+  d8: T(d) = ['F_AROMATIC_RING', 'F_CYANO', 'F_HYDROXYL', 'F_KETONE']
+      Drug(d) = ['mol_7']   (threshold c > 2/15)
+
+WORKED EVALUATION (d1 x mol_9: same structure as mol_1, low dose)
+  rho = 1 (structure complete), but c = 1/50 <= g/K0 = 1/15 -> B = 0 (refused)
+
+==============================================================================
+PROOF BATTERY
+==============================================================================
+  [PROVED    ] S1[d1]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d2]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d3]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d4]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d5]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d6]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d7]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S1[d8]: law engine-certified, exact residual 0, target structure nonempty
+  [PROVED    ] S2[all-pairs]: UNIVERSAL: rho(d, m) = 1 <=> T(d) subset of chi_m (all 96 structure pairs)
+  [PROVED    ] S3[all-pairs]: UNIVERSAL: B(d, m) = 1 <=> T(d) subset of chi_m AND c(m) > g(d)/K0 (all 96 pairs; branch enumeration over rho in {<1, =1})
+  [PROVED    ] S4[fixed:d1]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d1]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d2]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d2]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d3]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d3]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d4]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d4]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d5]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d5]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d6]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d6]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d7]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d7]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S4[fixed:d8]: m*(d) = T(d) at c = 2g/K0 is a fixed point of the cure law
+  [PROVED    ] S4[minimal:d8]: m*(d) minimal: every B = 1 molecule contains T(d), |chi_m| >= |T(d)|
+  [PROVED    ] S5[permutation]: NAME-FREENESS: full derivation invariant under label permutation -- Drug(d) keyed by structure address identical bit-for-bit
+  [PROVED    ] S5[source]: derivation path contains no label-keyed constants (AST scan of drug_of, m_star, cure_law, rho)
+  [PROVED    ] S6[residual:d1]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d1]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d2]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d2]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d3]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d3]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d4]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d4]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d5]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d5]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d6]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d6]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d7]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d7]: treated load of m*(d) strictly decays
+  [PROVED    ] S6[residual:d8]: treated family of m*(d) solves the treated ODE exactly
+  [PROVED    ] S6[decay:d8]: treated load of m*(d) strictly decays
+  [PROVED    ] decoy[d1|mol_8]: refused by the direct formula (structure_incomplete)
+  [PROVED    ] decoy[d1|mol_9]: refused by the direct formula (dose_insufficient)
+  [PROVED    ] decoy[d8|mol_2]: refused by the direct formula (structure_incomplete)
+  [PROVED    ] decoy[d3|mol_12]: refused by the direct formula (structure_incomplete)
+  [PROVED    ] decoy[d6|mol_9]: refused by the direct formula (structure_incomplete)
+  [PROVED    ] S7[d1]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d2]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d3]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d4]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d5]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d6]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d7]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+  [PROVED    ] S7[d8]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
+
+  57/57 theorems PROVED  (elapsed 2.55 s)
+
+DERIVATION TRACE (d1 -- the direct path disease -> drug)
+    [D1] ok: T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']  (n = 3); the disease IS this structure
+    [D2] ok: rho(d, m) = |T AND chi_m| / |T| in [0, 1]; rho = 1  <=>  T subset of chi_m (cardinality: |T AND chi_m| <= |T| with equality iff containment)
+    [D3] ok: binding-completeness axiom (declared): cure requires rho = 1
+    [D4] ok: under rho = 1: k_eff = K0 * c, strictly increasing in c (d k_eff/d c = K0 > 0), unique crossing c* = g/K0, k_eff(0) = 0 < g -- single crossing
+    [D5] ok: THEREFORE (always true): Drug(d) = { m : T(d) subset of chi_m AND c(m) > g(d)/K0 }
+    [D6] ok: direct construction: m*(d) = T(d) at exposure c >= 2c* = 2/15 -- k_eff = K0 c = 2 g > g, certified decay
