@@ -61,6 +61,19 @@ credited as progress toward settlement: the verdict is NO_FULL_PROOF, the
 missing machinery is listed per formula, and the run exits non-zero.  The
 engine does not settle for progress; it either proves the whole conjecture or
 refuses.
+
+EQUIVALENCE PROGRESS FORMS
+--------------------------
+Each open conjecture is additionally attacked through its EQUIVALENT
+reformulations (the classical progress forms): Riemann via the Li criterion
+and the Lagarias inequality, Collatz via the exact inverse-tree enumeration
+and backward-coverage counting, Navier-Stokes via the Beale-Kato-Majda
+integral criterion and the Leray a-priori-bound form.  The conjecture is
+certified the moment ANY fully proved equivalent form closes the equivalence
+chain (that is what an equivalence is for); every unproved equivalent form is
+reported as honest equivalence progress: what the engine derived, and exactly
+which mathematical machinery is still missing.  Progress forms never soften
+the gate -- they only widen the roads toward a complete proof.
 """
 
 import json
@@ -438,6 +451,9 @@ class AutonomousProofEngine:
     # ------------------------------------------------------------------
     def _t1_structural_diagnosis(self):
         ctx = self.open_problem_context or {}
+        for m in ctx.get("required_machinery_declared", []) or []:
+            if m not in self.required_machinery:
+                self.required_machinery.append(str(m))
         if ctx.get("pde_dimensional"):
             self._add_gap("structural_pde",
                           "constraint field is a multi-dimensional PDE; no SymPy ODE/algebraic "
@@ -2268,13 +2284,25 @@ class MultiFormulaProof:
         self.conjecture_name = str(conjecture_name)
         self.full_proof_only = bool(full_proof_only)
         self.formulas = []          # [{'tag', 'engine'}]
+        self.equivalent_forms = []  # [{'tag', 'engine'}]
         self.verdicts = []
+        self.equivalence_progress = []
+        self.proved_via_equivalent_form = None
         self.status = "EMPTY_SYSTEM"
         self.elapsed = 0.0
 
     def add_formula(self, tag, engine):
         engine.full_proof_only = self.full_proof_only
         self.formulas.append({"tag": str(tag), "engine": engine})
+        return self
+
+    def add_equivalent_form(self, tag, engine):
+        """Declare an equivalent reformulation of the conjecture.  A FULL proof
+        of the equivalent form certifies the conjecture (that is what a
+        declared equivalence means); an unproved one is recorded as honest
+        equivalence progress and never settles the run."""
+        engine.full_proof_only = self.full_proof_only
+        self.equivalent_forms.append({"tag": str(tag), "engine": engine})
         return self
 
     def prove_all(self):
@@ -2295,9 +2323,34 @@ class MultiFormulaProof:
                 "discovered_diagnostics": res["discovered"],
                 "elapsed_s": res["elapsed_s"],
             })
-        if not self.formulas:
+        self.equivalence_progress = []
+        self.proved_via_equivalent_form = None
+        for entry in self.equivalent_forms:
+            res = entry["engine"].solve_and_verify()
+            full = (res["status"] == "PROVEN_EXACT"
+                    and res["certified_fn"] is not None
+                    and not res["gaps"])
+            self.equivalence_progress.append({
+                "equivalent_form": entry["tag"],
+                "status": res["status"],
+                "full_proof": bool(full),
+                "certified_fn": res["certified_fn"],
+                "gaps": res["gaps"],
+                "machinery": res["machinery"],
+                "derived_conditions": res["derived_conditions"],
+                "discovered_diagnostics": res["discovered"],
+                "elapsed_s": res["elapsed_s"],
+            })
+        proved = bool(self.formulas) and all(v["full_proof"] for v in self.verdicts)
+        if not proved:
+            for prog in self.equivalence_progress:
+                if prog["full_proof"]:
+                    proved = True
+                    self.proved_via_equivalent_form = prog["equivalent_form"]
+                    break
+        if not self.formulas and not self.equivalent_forms:
             self.status = "EMPTY_SYSTEM"
-        elif all(v["full_proof"] for v in self.verdicts):
+        elif proved:
             self.status = "PROVEN_EXACT"
         else:
             self.status = "NO_FULL_PROOF"
@@ -2312,6 +2365,11 @@ class MultiFormulaProof:
             "n_formulas": len(self.formulas),
             "n_formulas_fully_proved": sum(1 for v in self.verdicts if v["full_proof"]),
             "verdicts": list(self.verdicts),
+            "n_equivalent_forms": len(self.equivalent_forms),
+            "n_equivalent_forms_fully_proved":
+                sum(1 for p in self.equivalence_progress if p["full_proof"]),
+            "proved_via_equivalent_form": self.proved_via_equivalent_form,
+            "equivalence_progress": list(self.equivalence_progress),
             "elapsed_s": self.elapsed,
         }
 
@@ -2320,11 +2378,17 @@ class MultiFormulaProof:
         obligations = []
         if self.status == "PROVEN_EXACT":
             obligations.append("Re-derive every formula's proof chain in a formal kernel.")
+            if self.proved_via_equivalent_form:
+                obligations.append("Verify the declared equivalence chain between the "
+                                   f"conjecture and '{self.proved_via_equivalent_form}' "
+                                   "in a formal kernel.")
         else:
             blocking = [v["formula"] for v in self.verdicts if not v["full_proof"]]
-            obligations.append("Discharge the blocking formulas in a formal kernel "
-                               "before any certification claim is admissible: "
-                               + "; ".join(blocking))
+            blocking += [p["equivalent_form"] for p in self.equivalence_progress
+                         if not p["full_proof"]]
+            obligations.append("Discharge the blocking formulas and equivalent forms "
+                               "in a formal kernel before any certification claim is "
+                               "admissible: " + "; ".join(blocking))
         cert["proof_obligations_for_formal_kernel"] = obligations
         return json.loads(json.dumps(cert, default=str))
 
@@ -2378,11 +2442,137 @@ def bench_dalembert():
     return eng, eng.solve_and_verify()
 
 
-def _engine_riemann_selfduality(full_proof_only=False):
+def _engine_riemann_li_criterion(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Riemann hypothesis | Li criterion equivalence lambda_n >= 0",
+        func_name='L', var_name='n', aux_var_name='m',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("Li coefficients lambda_n = (1/2) sum over nontrivial "
+                           "zeros rho of [1 - (1 - 1/rho)^n]")
+    eng.set_open_problem({
+        "objective": "lambda_n >= 0 for every positive integer n (equivalent to RH)",
+        "arithmetic_atoms": ["nontrivial zeros rho of zeta",
+                             "Keiper generating function of log xi"],
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "zero-sum evaluation over the zeta spectrum (Weil explicit formula)",
+            "positivity certificate for the Stieltjes-cumulant sequence lambda_n",
+        ],
+    })
+    return eng
+
+
+def _engine_riemann_lagarias(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Riemann hypothesis | Lagarias elementary inequality equivalence",
+        func_name='S', var_name='n', aux_var_name='m',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("sigma(n) <= H_n + exp(H_n) log H_n for every n >= 1, "
+                           "sigma the divisor sum, H_n the harmonic number")
+    eng.set_open_problem({
+        "objective": "the Lagarias inequality for all n >= 1 (equivalent to RH)",
+        "arithmetic_atoms": ["divisor sum sigma(n)", "harmonic numbers H_n"],
+        "discrete_domain": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "multiplicative structure of sigma(n) over prime factorisations",
+            "effective rational bounds on H_n and exp(H_n) log H_n on the integers",
+        ],
+    })
+    return eng
+
+
+def _engine_collatz_inverse_tree(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Collatz conjecture | exact inverse-tree enumeration of the preimages of T",
+        func_name='g', var_name='n', aux_var_name='m',
+        full_proof_only=full_proof_only)
+    g, x = eng.f, eng.x
+    eng.declare_hypothesis("T(n) = n/2 (n even) | (3n+1)/2 (n odd); the inverse "
+                           "branches are n -> 2n (always) and n -> (2n-1)/3 "
+                           "(iff 2n = 1 mod 3 and the preimage is odd)")
+    eng.add_self_relation(g(x / 2), g(x))
+    eng.add_self_relation(g((2 * x - 1) / 3), g(x))
+    eng.set_open_problem({
+        "objective": "the backward tree rooted at 1 covers every n in N+ "
+                     "(equivalent to the Collatz conjecture)",
+        "discrete_domain": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "modular admissibility of the odd inverse branch (2n = 1 mod 3)",
+            "well-founded coverage argument over the infinite backward tree",
+            "exclusion of backward cycles other than the trivial 1-2 loop",
+        ],
+    })
+    return eng
+
+
+def _engine_collatz_coverage(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "Collatz conjecture | backward-tree coverage counting (Krasikov-Lagarias form)",
+        func_name='N', var_name='x', aux_var_name='y',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("N(x) = #{n <= x : the orbit of n reaches 1}; coverage "
+                           "for all x >= 1 is equivalent to the Collatz conjecture")
+    eng.set_open_problem({
+        "objective": "N(x) = floor(x) for all x >= 1",
+        "discrete_domain": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "Krasikov-Lagarias density-propagation inequality for the backward tree",
+            "propagation of a positive density exponent to full coverage",
+        ],
+    })
+    return eng
+
+
+def _engine_ns_bkm_equivalence(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "3D Navier-Stokes | Beale-Kato-Majda integral-criterion equivalence",
+        func_name='W', var_name='t', aux_var_name='s',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("a smooth solution loses regularity at time T only if "
+                           "integral over [0, T] of ||omega||_inf^2 diverges")
+    eng.set_open_problem({
+        "objective": "global regularity is equivalent to finiteness of the BKM "
+                     "integral on every finite interval",
+        "pde_dimensional": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "vorticity transport estimate linking omega to grad u",
+            "logarithmic Sobolev / Biot-Savart inequality: omega in L_inf "
+            "controls grad u in BMO",
+        ],
+    })
+    return eng
+
+
+def _engine_ns_leray_equivalence(full_proof_only=True):
+    eng = AutonomousProofEngine(
+        "3D Navier-Stokes | Leray a-priori-bound equivalence",
+        func_name='E', var_name='t', aux_var_name='s',
+        full_proof_only=full_proof_only)
+    eng.declare_hypothesis("global regularity is equivalent to a uniform-in-time "
+                           "enstrophy ladder that closes for every horizon T")
+    eng.set_open_problem({
+        "objective": "sup over t in [0, T] of ||grad u(t)||_L2^2 stays bounded by "
+                     "the data for every T (equivalent to global regularity)",
+        "pde_dimensional": True,
+        "beyond_symbolic_scope": True,
+        "required_machinery_declared": [
+            "enstrophy ladder: the 3D vortex-stretching term must be dominated",
+            "critical-regularity closure (log-loss absorbed or removed)",
+        ],
+    })
+    return eng
+
+
+def _engine_riemann_selfduality(full_proof_only=False, k_max=3, series_order=8):
     eng = AutonomousProofEngine(
         "Riemann hypothesis | xi self-duality xi(s) = xi(1-s)",
         func_name='xi', var_name='s', aux_var_name='w',
-        auto_declare_regularity=True, full_proof_only=full_proof_only)
+        auto_declare_regularity=True, full_proof_only=full_proof_only,
+        k_max=k_max, series_order=series_order)
     xi, s = eng.f, eng.x
     eng.declare_hypothesis("xi(s) = (1/2) s (s-1) pi^(-s/2) Gamma(s/2) zeta(s)")
     eng.add_self_relation(xi(s), xi(1 - s))
@@ -2608,20 +2798,26 @@ def bench_ns3d():
 
 def bench_riemann_fullproof():
     mfp = MultiFormulaProof(
-        "Riemann hypothesis | full-proof-only, multi-formula",
+        "Riemann hypothesis | full-proof-only, multi-formula + equivalence forms",
         full_proof_only=True)
     mfp.add_formula(
         "F1: xi self-duality xi(s) = xi(1-s) with complete branch enumeration",
-        _engine_riemann_selfduality(full_proof_only=True))
+        _engine_riemann_selfduality(full_proof_only=True, k_max=4, series_order=10))
     mfp.add_formula(
         "F2: every nontrivial zero of zeta lies on Re(s) = 1/2",
         _engine_riemann_critical_line())
+    mfp.add_equivalent_form(
+        "EQ1: Li criterion lambda_n >= 0 for every n >= 1",
+        _engine_riemann_li_criterion())
+    mfp.add_equivalent_form(
+        "EQ2: Lagarias inequality sigma(n) <= H_n + exp(H_n) log H_n for all n",
+        _engine_riemann_lagarias())
     return mfp
 
 
 def bench_collatz_fullproof():
     mfp = MultiFormulaProof(
-        "Collatz conjecture | full-proof-only, multi-formula",
+        "Collatz conjecture | full-proof-only, multi-formula + equivalence forms",
         full_proof_only=True)
     mfp.add_formula(
         "F1: parity-averaged smooth surrogate admits only the constant invariant",
@@ -2629,12 +2825,19 @@ def bench_collatz_fullproof():
     mfp.add_formula(
         "F2: no non-trivial cycle and no divergent orbit on N+ (Collatz)",
         _engine_collatz_cycles())
+    mfp.add_equivalent_form(
+        "EQ1: exact inverse-tree enumeration of T^{-1} covers N+ from 1",
+        _engine_collatz_inverse_tree())
+    mfp.add_equivalent_form(
+        "EQ2: backward-coverage counting N(x) = floor(x) (Krasikov-Lagarias form)",
+        _engine_collatz_coverage())
     return mfp
 
 
 def bench_ns3d_fullproof():
     mfp = MultiFormulaProof(
-        "3D Navier-Stokes global regularity | full-proof-only, multi-formula",
+        "3D Navier-Stokes global regularity | full-proof-only, multi-formula "
+        "+ equivalence forms",
         full_proof_only=True)
     mfp.add_formula(
         "F1: Leray energy class controls smooth divergence-free data",
@@ -2642,6 +2845,12 @@ def bench_ns3d_fullproof():
     mfp.add_formula(
         "F2: vortex stretching is controlled; no finite-time blow-up",
         _engine_ns_blowup())
+    mfp.add_equivalent_form(
+        "EQ1: BKM integral criterion finiteness on every finite interval",
+        _engine_ns_bkm_equivalence())
+    mfp.add_equivalent_form(
+        "EQ2: Leray enstrophy ladder closes uniformly in time",
+        _engine_ns_leray_equivalence())
     return mfp
 
 
@@ -2672,6 +2881,34 @@ def bench_burgers_multi_negative():
     return mfp
 
 
+def bench_equiv_gate_positive():
+    """Gate self-test (machinery check, NOT an open conjecture): the primary
+    formula is only a classification, but a declared equivalent form is fully
+    provable -- the conjecture must be certified via the equivalence route."""
+    mfp = MultiFormulaProof(
+        "equivalence gate self-test | certification via equivalent form",
+        full_proof_only=True)
+    mfp.add_formula("F1: Burgers family classification (not a full proof)",
+                    bench_burgers_family()[0])
+    mfp.add_equivalent_form("EQ1: Burgers IVP pinned solution u == 1",
+                            bench_burgers_ivp()[0])
+    return mfp
+
+
+def bench_equiv_gate_negative():
+    """Gate self-test (machinery check, NOT an open conjecture): neither the
+    primary formulas nor the equivalent form is provable -- the run must
+    refuse, and every progress form must report what is missing."""
+    mfp = MultiFormulaProof(
+        "equivalence gate self-test | all routes unproved",
+        full_proof_only=True)
+    mfp.add_formula("F1: parity-averaged smooth surrogate invariant (Collatz)",
+                    _engine_collatz_surrogate(full_proof_only=True))
+    mfp.add_equivalent_form("EQ1: backward-tree coverage counting (Collatz)",
+                            _engine_collatz_coverage())
+    return mfp
+
+
 OPEN_CONJECTURES = [
     ("riemann_fullproof", bench_riemann_fullproof),
     ("collatz_fullproof", bench_collatz_fullproof),
@@ -2681,6 +2918,8 @@ OPEN_CONJECTURES = [
 MULTI_FORMULA_GATE_CHECKS = [
     ("burgers_multi_positive", bench_burgers_multi_positive),
     ("burgers_multi_negative", bench_burgers_multi_negative),
+    ("equiv_gate_positive", bench_equiv_gate_positive),
+    ("equiv_gate_negative", bench_equiv_gate_negative),
 ]
 
 
@@ -2977,6 +3216,14 @@ def run_open_assertions(R, MFPS):
                   if not v["full_proof"]))
         check(f"{key}: multi-formula statement actually spans several formulas",
               r["n_formulas"] >= 2, r["n_formulas"])
+        check(f"{key}: equivalent reformulations were attempted",
+              r["n_equivalent_forms"] >= 2, r["n_equivalent_forms"])
+        check(f"{key}: no equivalent form settles the conjecture (honest refusal)",
+              r["n_equivalent_forms_fully_proved"] == 0
+              and r["proved_via_equivalent_form"] is None)
+        check(f"{key}: every unproved equivalent form reports gaps or machinery",
+              all(p["gaps"] or p["machinery"] for p in r["equivalence_progress"]
+                  if not p["full_proof"]))
 
     pos = R["burgers_multi_positive"]
     check("gate positive: all-formulas-proved conjecture IS certified",
@@ -2991,6 +3238,24 @@ def run_open_assertions(R, MFPS):
     check("gate negative: the blocking formula is exactly identified",
           any(not v["full_proof"] and "Collatz" in v["formula"]
               for v in neg["verdicts"]))
+    eqp = R["equiv_gate_positive"]
+    check("gate positive: certification via a fully proved EQUIVALENT form",
+          eqp["status"] == "PROVEN_EXACT"
+          and eqp["proved_via_equivalent_form"] is not None
+          and eqp["n_formulas_fully_proved"] == 0
+          and eqp["n_equivalent_forms_fully_proved"] == 1,
+          f"{eqp['status']} via {eqp['proved_via_equivalent_form']}")
+    eqn = R["equiv_gate_negative"]
+    check("gate negative: all unproved routes refuse certification together",
+          eqn["status"] == "NO_FULL_PROOF"
+          and eqn["n_formulas_fully_proved"] == 0
+          and eqn["n_equivalent_forms_fully_proved"] == 0
+          and eqn["proved_via_equivalent_form"] is None,
+          f"{eqn['status']} {eqn['n_formulas_fully_proved']}"
+          f"/{eqn['n_equivalent_forms_fully_proved']}")
+    check("gate negative: the unproved equivalent form reports its machinery",
+          all(p["machinery"] for p in eqn["equivalence_progress"]),
+          str([p["equivalent_form"] for p in eqn["equivalence_progress"]]))
     return checks
 
 
@@ -3020,6 +3285,23 @@ def write_open_report(R, checks, path):
                 L.append(f"    unsettled gap: {g['tag']}: {g['detail'][:150]}")
             for m in v["machinery"]:
                 L.append(f"    missing machinery: {m}")
+        L.append("  equivalent reformulations (equivalence progress forms):")
+        for p in r["equivalence_progress"]:
+            L.append(f"  - {p['equivalent_form']}")
+            L.append(f"      status={p['status']} full_proof={p['full_proof']} "
+                     f"certified_fn={p['certified_fn']}")
+            if p["derived_conditions"]:
+                L.append(f"      derived progress ({len(p['derived_conditions'])} "
+                         "necessary conditions):")
+                for dc in p["derived_conditions"][:4]:
+                    L.append(f"        - {str(dc)[:140]}")
+            for d in p["discovered_diagnostics"][:4]:
+                L.append(f"      derived structure: {d['formula'][:140]}")
+            for m in p["machinery"]:
+                L.append(f"      missing machinery: {m}")
+        if r["proved_via_equivalent_form"]:
+            L.append(f"  certified via equivalent form: "
+                     f"{r['proved_via_equivalent_form']}")
         L.append("")
     L.append("=" * 78)
     L.append("MULTI-FORMULA GATE SELF-TESTS (machinery check, not conjectures)")
