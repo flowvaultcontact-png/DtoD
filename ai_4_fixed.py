@@ -3818,6 +3818,8 @@ class CorpusNGram:
     def load(cls, path):
         with gzip.open(path, "rt", encoding="utf-8") as fh:
             ser = json.load(fh)
+        if not isinstance(ser, dict) or "order" not in ser or "counts" not in ser:
+            return None
         obj = cls(ser["order"])
         obj.n_tokens = int(ser.get("n_tokens", 0))
         for k, ck_ser in enumerate(ser["counts"]):

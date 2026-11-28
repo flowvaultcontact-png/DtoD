@@ -1,0 +1,25 @@
+{
+  "version": "4.0",
+  "N": 7616,
+  "sensory_slice": [
+    0,
+    128
+  ],
+  "motor_slice": [
+    7488,
+    7616
+  ],
+  "delay_max": 6,
+  "target_fire_rate": 0.04,
+  "n_layers": 46,
+  "drives": {
+    "homomorphism": 0.5,
+    "flow_bifurcation": 0.5,
+    "spectral_op": 0.5,
+    "constraint_core": 0.5,
+    "orbit_parity": 0.5,
+    "bilinear_fiber": 0.5
+  },
+  "has_vocab": true,
+  "source_model_path": "/tmp/glm53/UD-IQ1_S"
+}

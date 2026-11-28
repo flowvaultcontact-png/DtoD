@@ -1,0 +1,428 @@
+{
+  "problem": "brain greedy output equals the certified ground-truth channel (Frontier-Parity Distillation, AutonomousProofEngine v2 certifier)",
+  "mode": "glm_frontier_channel_llamacpp",
+  "model": "/tmp/glm53/UD-IQ1_S",
+  "brain_dir": "/tmp/glm53-brain",
+  "prompt": "The capital of France is",
+  "rounds": [
+    {
+      "round": 1,
+      "distill_loss_first": 5.526472941553059,
+      "distill_loss_last": 5.021804869200877,
+      "status": "PROVEN_EXACT",
+      "certified_fn": "-log(123096812967*lam**2 + 493376882*lam + 494368)/2 - log(500) + log(494368)/2",
+      "gaps": [],
+      "residuals": [
+        0.999,
+        0.9969903634525014
+      ],
+      "positions": {
+        "a": [
+          0.001,
+          0.001
+        ],
+        "b": [
+          1.0,
+          0.9979903634525014
+        ],
+        "argmax_agree": [
+          false,
+          false
+        ]
+      },
+      "evidence_positions": 48,
+      "lam_star": 1.0,
+      "lam_boundary": true,
+      "parity_certified": false,
+      "battery": [
+        {
+          "prompt": " countries of the European Union. Paris is famous for the E",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            3092,
+            301,
+            21884,
+            13,
+            12089,
+            374,
+            11240,
+            369,
+            279,
+            468,
+            3092,
+            301
+          ],
+          "brain_tokens": [
+            374,
+            279,
+            7513,
+            7513,
+            9142,
+            13,
+            7513,
+            9142,
+            374,
+            279,
+            7513,
+            7513
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": false,
+          "first_divergence": 2,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
+          ],
+          "brain_tokens": [
+            315,
+            43215,
+            315,
+            43215,
+            43215,
+            13,
+            12089,
+            374,
+            13,
+            1084,
+            7407,
+            304
+          ]
+        },
+        {
+          "prompt": "The capital of France is",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            12089,
+            13,
+            1084,
+            374,
+            7407,
+            304,
+            279,
+            10195,
+            83388,
+            949,
+            315,
+            9621
+          ],
+          "brain_tokens": [
+            374,
+            279,
+            146737,
+            279,
+            18143,
+            7513,
+            9142,
+            7513,
+            9142,
+            13,
+            7513,
+            9142
+          ]
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "distill_loss_first": 4.526105658371223,
+      "distill_loss_last": 4.277813309276172,
+      "status": "PROVEN_EXACT",
+      "certified_fn": "-log(354760994889*lam**2 + 1422297444*lam + 1425556)/2 - log(500) + log(1425556)/2",
+      "gaps": [],
+      "residuals": [
+        0.999,
+        0.9964283718078779
+      ],
+      "positions": {
+        "a": [
+          0.001,
+          0.001
+        ],
+        "b": [
+          1.0,
+          0.9974283718078779
+        ],
+        "argmax_agree": [
+          false,
+          false
+        ]
+      },
+      "evidence_positions": 48,
+      "lam_star": 1.0,
+      "lam_boundary": true,
+      "parity_certified": false,
+      "battery": [
+        {
+          "prompt": " countries of the European Union. Paris is famous for the E",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            3092,
+            301,
+            21884,
+            13,
+            12089,
+            374,
+            11240,
+            369,
+            279,
+            468,
+            3092,
+            301
+          ],
+          "brain_tokens": [
+            374,
+            279,
+            279,
+            146737,
+            18143,
+            13,
+            146737,
+            10943,
+            12089,
+            13,
+            374,
+            374
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
+          ],
+          "brain_tokens": [
+            43215,
+            13,
+            315,
+            43215,
+            43215,
+            315,
+            43215,
+            13,
+            12089,
+            13,
+            1084,
+            374
+          ]
+        },
+        {
+          "prompt": "The capital of France is",
+          "exact": false,
+          "first_divergence": 0,
+          "model_tokens": [
+            12089,
+            13,
+            1084,
+            374,
+            7407,
+            304,
+            279,
+            10195,
+            83388,
+            949,
+            315,
+            9621
+          ],
+          "brain_tokens": [
+            374,
+            279,
+            146737,
+            374,
+            279,
+            146737,
+            10943,
+            10943,
+            279,
+            7513,
+            7513,
+            9142
+          ]
+        }
+      ]
+    },
+    {
+      "round": "parity_fit",
+      "status": "PROVEN_EXACT",
+      "certified_fn": "-log(500)",
+      "gaps": [],
+      "residuals": [
+        3.3225508943917834e-07,
+        1.714975444502831e-07
+      ],
+      "positions": {
+        "a": [
+          0.001,
+          0.001
+        ],
+        "b": [
+          0.0010003322550894392,
+          0.0010001714975444503
+        ],
+        "argmax_agree": [
+          true,
+          true
+        ]
+      },
+      "evidence_positions": 48,
+      "lam_star": 1.0,
+      "lam_boundary": true,
+      "parity_certified": true,
+      "fit": {
+        "fit_positions": 146,
+        "ce_first": 5.894190311431885,
+        "ce_last": 0.026164088398218155,
+        "argmax_agree_truepath": 146,
+        "calib_max_err": 0.00022922658920287997,
+        "calibration_targets": 48
+      },
+      "battery": [
+        {
+          "prompt": " countries of the European Union. Paris is famous for the E",
+          "exact": true,
+          "first_divergence": null,
+          "model_tokens": [
+            3092,
+            301,
+            21884,
+            13,
+            12089,
+            374,
+            11240,
+            369,
+            279,
+            468,
+            3092,
+            301
+          ],
+          "brain_tokens": [
+            3092,
+            301,
+            21884,
+            13,
+            12089,
+            374,
+            11240,
+            369,
+            279,
+            468,
+            3092,
+            301
+          ]
+        },
+        {
+          "prompt": " countries of the European Union. Paris is famous for the Eiffel Tower, the Louvre museum, and the cathedral",
+          "exact": true,
+          "first_divergence": null,
+          "model_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
+          ],
+          "brain_tokens": [
+            315,
+            43215,
+            9416,
+            373,
+            13,
+            12089,
+            374,
+            279,
+            6722,
+            315,
+            9621,
+            13
+          ]
+        },
+        {
+          "prompt": "The capital of France is",
+          "exact": true,
+          "first_divergence": null,
+          "model_tokens": [
+            12089,
+            13,
+            1084,
+            374,
+            7407,
+            304,
+            279,
+            10195,
+            83388,
+            949,
+            315,
+            9621
+          ],
+          "brain_tokens": [
+            12089,
+            13,
+            1084,
+            374,
+            7407,
+            304,
+            279,
+            10195,
+            83388,
+            949,
+            315,
+            9621
+          ]
+        }
+      ]
+    }
+  ],
+  "engine_status": "PROVEN_EXACT",
+  "certified_fn": "-log(354760994889*lam**2 + 1422297444*lam + 1425556)/2 - log(500) + log(1425556)/2",
+  "lam_production": 1.0,
+  "brain_only_parity_certified": true,
+  "parity_fit": {
+    "fit_positions": 146,
+    "ce_first": 5.894190311431885,
+    "ce_last": 0.026164088398218155,
+    "argmax_agree_truepath": 146,
+    "calib_max_err": 0.00022922658920287997,
+    "calibration_targets": 48,
+    "certified": true
+  },
+  "declared_domain": "enumerated fit/battery set: the certified reference greedy streams of the battery prompts, the measured corpus positions, and the corpus training prefix; every replay starts from the captured canonical modulatory state (drives/theta/rate_ema) and the brain is saved under that state, so reloaded-brain replays reproduce the certified conditions",
+  "gaps": [
+    "parity is certified on the declared domain only; generalization to all possible prompts is a declared hypothesis, never settled"
+  ],
+  "reference_text": "The capital of France is Paris. It is located in the north-central part of France",
+  "production_text": "The capital of France is Paris. It is located in the north-central part of France",
+  "tokens_per_s": 118.01901498500874
+}

@@ -1,0 +1,18 @@
+{
+  "hyper_connections": [
+    90,
+    180
+  ],
+  "kda_ssm": [
+    272,
+    102
+  ],
+  "dsa_indexer": [
+    60,
+    24
+  ],
+  "mtp_nextn": [
+    1,
+    3
+  ]
+}
