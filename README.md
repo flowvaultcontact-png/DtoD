@@ -173,3 +173,90 @@ python3 structure_math.py
 Artifacts: `structure_math_out/representations.json`,
 `structure_math_out/structure_math_report.txt`,
 `structure_math_out/structure_math_certificate.json`. NOT clinical advice.
+
+## The correlation engine: representation-to-representation drug discovery
+
+`structure_math.py` stays as the minimal baseline. The new milestone moves
+beyond the binary-fragment rule engine to a **mathematically derived
+disease-drug relationship model**, in independent modules:
+
+| Module | Responsibility |
+| --- | --- |
+| `molecular_math.py` | Molecular graph + 3D mathematics: `M = (V, E, A, B, X, G)` — atoms, bonds, attributes, coordinates, derived geometry; canonical (renumbering-invariant) signature; chemical validity (valence + connectivity); declared contact-energy model |
+| `biological_state_math.py` | Disease state `D = (P, N, S, F, J)`: pathway activities, interaction network, structural target (pharmacophore) + anti-target, functional readouts, certified dynamics; healthy state `H`; distance `L(D)`; intervention equations `T(D, M)` |
+| `structural_correlation.py` | The correlation discovery engine: the fingerprint `Phi(D, M)`, the causal-chain gates, the central derivation `M* = argmin L(D, T(D, M))`, theorems T8-T11 |
+| `independent_validation.py` | Blind testing: name blindness, corpus blindness, representation-only inference, blind discovery on held-out structures |
+
+### The multidimensional relationship
+
+```text
+Phi(D, M) = [ C_struct, E_binding, b, kappa*c, exposure_margin ]
+```
+
+`C_struct` = matched fraction of the target pharmacophore in 3D (within 3 A);
+`E_binding` = declared contact energy (donor-acceptor -2, ionic -3,
+aromatic/hydrophobic -1, clash +4, exact rationals); `b` = binding strength
+derived from E; `kappa = K1 * max(0, -E)` drives the dynamic response;
+exposure margin = `c(m) - g(d)/kappa`.
+
+### The causal chain (each link independently testable — nothing assumed)
+
+```text
+Molecule -> Binding -> Biological change -> Disease-state change
+gates: structural, binding, functional, pathway, dynamic, exposure, safety
+C(D, M) = (prod gates)^(1/7)      -- weights FORCED by the causal-chain axiom
+Derived: C(D, M) > 0 <=> every gate passes <=> B(D, M) = 1
+```
+
+### The central derivation
+
+```text
+M*(D) = argmin_{M in M_valid} L(D, T(D, M))   subject to B(D, M) = 1
+```
+
+`M_valid` = chemically valid structures (valence + connectivity checked);
+the argmin is exhaustively verified. The intervention equations pull the
+targeted pathway coordinate toward the healthy state, with the exact
+identity `L(T(D,M)) = L(D) - w b (2-b) (P_t - H_t)^2` — so binding that does
+not change the disease state can never be declared a drug.
+
+### Theorems (structural_correlation, 44/44 PROVED)
+
+- **T8 representation invariance** — renumbering atoms changes neither
+  `Phi(D, M)` nor `B` (every invariant is renumbering-invariant)
+- **T9 structural sufficiency** — molecules with identical canonical
+  signatures have identical `Phi` and `B`
+- **T10 independent correlation** — the 3D prediction implies the 2D
+  structural condition; every 2D-yes/3D-no divergence is caused by a
+  recorded physical gate (the information gain of 3D)
+- **T11 causal consistency** — every predicted-successful interaction
+  produces the predicted disease-state change, exact residual 0
+- **R1** gate necessity; **R2** the argmin derivation; **R3** hermetic
+  derivation/validation separation (frozen module snapshot + input sha256)
+
+### Independent validation (6/6 checks PASS)
+
+- **V1 name blindness** — predictions identical under label stripping +
+  permutation, keyed by structure address
+- **V2 corpus blindness** — the derivation-time module snapshot contains no
+  validation/pairing module
+- **V3 representation-only** — AST scan: no molecule->disease pairing table
+  exists in any derivation source
+- **V4 blind discovery** — held-out structures (never in the corpus,
+  signatures verified novel) and a held-out disease state: the engine
+  derives `M*(ds_blind)` with `L* = 0` from representations alone, and all
+  predictions match the independently declared outcomes
+
+Run:
+
+```bash
+python3 structural_correlation.py      # 44/44 theorems
+python3 independent_validation.py      # 6/6 blind checks
+```
+
+Honest limitation, stated in the model itself: the interaction constants are
+declared physical-model constants, and all current corpora are synthetic.
+The architecture now distinguishes derivation information from validation
+information; replacing the declared constants with measured values and the
+synthetic corpora with real structures is the next milestone. NOT clinical
+advice.

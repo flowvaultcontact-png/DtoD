@@ -2,7 +2,7 @@
   "problem": "Drug-disease interaction | constant exposure c: D' = (g - k c) D (initial load D0)",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 1.64,
+  "elapsed_s": 1.6,
   "axioms": [],
   "gaps": [],
   "machinery": [

@@ -2,7 +2,7 @@
   "problem": "Drug PK | constant infusion with first-order elimination C' = R - k C",
   "status": "PROVEN_EXACT",
   "certified_fn": "R/k - R*exp(-k*t)/k",
-  "elapsed_s": 0.68,
+  "elapsed_s": 0.7,
   "axioms": [],
   "gaps": [],
   "machinery": [

@@ -2,7 +2,7 @@
   "problem": "Drug-disease interaction | unit initial load D(0) = 1 (clearance law)",
   "status": "PROVEN_EXACT",
   "certified_fn": "exp(-t*(c*k - g))",
-  "elapsed_s": 1.43,
+  "elapsed_s": 1.4,
   "axioms": [],
   "gaps": [],
   "machinery": [

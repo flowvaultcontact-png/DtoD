@@ -2,7 +2,7 @@
   "problem": "Disease dynamics | untreated progression D' = k D (initial load D0)",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 0.48,
+  "elapsed_s": 0.49,
   "axioms": [],
   "gaps": [],
   "machinery": [

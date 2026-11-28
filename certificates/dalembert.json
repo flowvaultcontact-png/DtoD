@@ -2,7 +2,7 @@
   "problem": "d'Alembert cosine equation f(x+y)+f(x-y) = 2 f(x) f(y)",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 11.7,
+  "elapsed_s": 11.61,
   "axioms": [
     {
       "tag": "C2_continuity_of_f_at_y=0",

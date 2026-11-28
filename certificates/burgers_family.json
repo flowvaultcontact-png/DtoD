@@ -2,7 +2,7 @@
   "problem": "1D steady Burgers u u' - nu u'' = 0 | complete branch classification",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 18.09,
+  "elapsed_s": 18.24,
   "axioms": [],
   "gaps": [],
   "machinery": [

@@ -2,7 +2,7 @@
   "problem": "Disease dynamics | capacity-limited progression D' = k D (1 - D/K)",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 3.8,
+  "elapsed_s": 3.78,
   "axioms": [],
   "gaps": [],
   "machinery": [

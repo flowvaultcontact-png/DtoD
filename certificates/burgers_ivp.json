@@ -2,7 +2,7 @@
   "problem": "1D steady Burgers | IVP u(0)=1, u'(0)=0",
   "status": "PROVEN_EXACT",
   "certified_fn": "1",
-  "elapsed_s": 17.21,
+  "elapsed_s": 17.03,
   "axioms": [],
   "gaps": [],
   "machinery": [

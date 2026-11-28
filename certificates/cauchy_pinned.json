@@ -2,7 +2,7 @@
   "problem": "Cauchy exponential equation | IVP f(0)=1, f'(0)=2",
   "status": "PROVEN_EXACT",
   "certified_fn": "exp(2*x)",
-  "elapsed_s": 1.24,
+  "elapsed_s": 1.25,
   "axioms": [
     {
       "tag": "C1_continuity_of_f_at_y=0",

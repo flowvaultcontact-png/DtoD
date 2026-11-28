@@ -2,7 +2,7 @@
   "problem": "Cauchy exponential equation | engine self-declares the needed C^1 axiom",
   "status": "PROVEN_CLASSIFICATION",
   "certified_fn": null,
-  "elapsed_s": 1.25,
+  "elapsed_s": 1.29,
   "axioms": [
     {
       "tag": "C1_continuity_of_f_at_y=0",

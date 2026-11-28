@@ -2,7 +2,7 @@
   "problem": "1D steady Burgers | singular-branch IVP u(0)=-2nu, u'(0)=2nu",
   "status": "PROVEN_EXACT",
   "certified_fn": "-2*nu/(x + 1)",
-  "elapsed_s": 38.63,
+  "elapsed_s": 38.52,
   "axioms": [],
   "gaps": [],
   "machinery": [

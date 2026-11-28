@@ -108,7 +108,7 @@ PROOF BATTERY
   [PROVED    ] S7[d7]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
   [PROVED    ] S7[d8]: direct derivation disease -> drug: all steps exact, formula assembled from T(d) alone
 
-  57/57 theorems PROVED  (elapsed 2.55 s)
+  57/57 theorems PROVED  (elapsed 2.5 s)
 
 DERIVATION TRACE (d1 -- the direct path disease -> drug)
     [D1] ok: T(d) = ['F_AMINE', 'F_AROMATIC_RING', 'F_SULFONAMIDE']  (n = 3); the disease IS this structure

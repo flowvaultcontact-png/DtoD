@@ -2,7 +2,7 @@
   "problem": "Riemann hypothesis | xi self-duality xi(s) = xi(1-s)",
   "status": "INCOMPLETE_PROOF_GAPS_REMAIN",
   "certified_fn": null,
-  "elapsed_s": 0.14,
+  "elapsed_s": 0.18,
   "axioms": [
     {
       "tag": "C1_continuity_of_f",

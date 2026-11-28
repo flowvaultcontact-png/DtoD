@@ -147,7 +147,7 @@ PROOF BATTERY
   [PROVED    ] M7[ANGINA_PECTORIS]: UNIVERSAL cure-law biconditional B(d,m)=1 <=> s>0 AND c(m) > c*(d,m) (complete branch enumeration, every input)
   [PROVED    ] M9[all-pairs]: retrieval always true: B(d,m) == derived predicate over all 120 corpus pairs; therapy(d) in Drug(d) for every disease; every decoy refused
 
-  69/69 theorems PROVED  (elapsed 3.14 s)
+  69/69 theorems PROVED  (elapsed 3.11 s)
 
 DERIVATION TRACE (HYPERTENSION -- what the input puts on any drug)
     [D1] ok: k_eff(d, m) = k(m) * c(m) * s / n (definitional, from the input)
